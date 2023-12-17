@@ -1,10 +1,8 @@
 name: Hello from .github
 on:
-  workflow_dispatch:
-    inputs:
-      my-name:
-        type: string
-        required: true
+  push:
+    tags:
+      - '*'
 jobs:
   hello:
     name: say hello
