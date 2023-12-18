@@ -1,0 +1,19 @@
+name: env.yml
+on:
+  pull_request:
+    paths:
+      - 'env.yml'
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Payu Version
+        uses: mamba-org/setup-micromamba@v1.7.0
+        with:
+          micromamba-version: '1.5.3-0'
+          environment-file: env.yml
+          environment-name: test-payu-environment
+          generate-run-shell: true
