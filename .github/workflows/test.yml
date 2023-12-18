@@ -23,7 +23,7 @@ jobs:
             if [[ "$DEP" == "access-om2" ]]; then
               DEP_VER=$(yq ".spack.specs[]" spack.yaml | cut -c16-)
             else
-              DEP_VER=$(yq ".spack.packages.\"$dep\".require" spack.yaml | cut -c6-)
+              DEP_VER=$(yq ".spack.packages.\"$DEP\".require" spack.yaml | cut -c6-)
               echo "other: $DEP_VER"
             fi
 
