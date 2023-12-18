@@ -10,7 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Payu Version
+      - name: Payu Version String Exists
+        run: |
+          VERSION=$(yq eval '.dependencies[] | select(contains("accessnri::payu")) | split("==") | .[1]' env.yml)
+          if [[ "$VERSION" == "null" ]]; then
+            echo "::error::No Payu version string found in env.yml"
+            exit 1
+          fi
+
+      - name: Env Valid
         uses: mamba-org/setup-micromamba@v1.7.0
         with:
           micromamba-version: '1.5.3-0'
