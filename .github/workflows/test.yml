@@ -7,6 +7,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Projection Version Matches
         # this step checks that the versions of the packages themselves match with the
         #  names of the modules. For example, mom5@git.2023.12.12 matches with the
