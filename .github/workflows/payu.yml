@@ -22,4 +22,7 @@ jobs:
 
       - name: Run conda build
         shell: bash -el {0}
+        env:
+          GIT_DESCRIBE_TAG: test
+          GIT_DESCRIBE_NUMBER: 0
         run: conda build . --no-anaconda-upload
