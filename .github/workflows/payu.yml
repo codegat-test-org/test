@@ -1,8 +1,6 @@
 name: env.yml
 on:
-  pull_request:
-    paths:
-      - 'env.yml'
+  workflow_dispatch:
 jobs:
   check:
     name: Check
@@ -10,10 +8,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Payu Version
-        uses: mamba-org/setup-micromamba@v1.7.0
+      - name: Setup conda environment
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          micromamba-version: '1.5.3-0'
+          miniconda-version: "latest"
+          python-version: 3.11
           environment-file: env.yml
-          environment-name: test-payu-environment
-          generate-run-shell: true
+          auto-update-conda: false
+          auto-activate-base: false
+          show-channel-urls: true
+
+      - name: Run conda build
+        shell: bash -el {0}
+        run: conda build . --no-anaconda-upload
