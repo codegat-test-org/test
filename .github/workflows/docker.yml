@@ -1,0 +1,20 @@
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+    container:
+      image: ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest
+      credentials:
+        name: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: activate and test spack
+        run: |
+          . $SPACK_ROOT/share/spack/setup-env.sh
+          spack env list
+      - name: attempt activation after
+        run: |
+          spack env list
