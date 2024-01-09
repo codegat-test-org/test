@@ -14,10 +14,12 @@ jobs:
       - name: activate and install spack
         run: |
           . $SPACK_ROOT/share/spack/setup-env.sh
-          spack env activate mom5
-          spack -d install --add --only package --fail-fast --no-checksum mom5@git.master%intel@2021.2.0
           cd $SPACK_ROOT/var/spack/environments/mom5
+          spack env activate mom5
           cp spack.lock mom5.original.spack.lock
+          spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
+          spack -d install --reuse-deps
+          cp spack.lock mom5.force.spack.lock
 
       - name: See if mom5.original.spack.lock exists
         run: cat $SPACK_ROOT/var/spack/environments/mom5/mom5.original.spack.lock
@@ -31,7 +33,6 @@ jobs:
           cp spack.lock mom5.force.spack.lock
 
       - name: Upload lockfiles
-        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: lockfile-output
