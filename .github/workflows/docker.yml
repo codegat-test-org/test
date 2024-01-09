@@ -11,10 +11,27 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: activate and test spack
+      - name: activate and install spack
         run: |
-          . $SPACK_ROOT/share/spack/setup-env.sh
-          spack env list
-      - name: attempt activation after
+          spack env activate mom5
+          spack -d install --add --only package --fail-fast --no-checksum mom5@git.master%intel@2021.2.0
+          cd $SPACK_ROOT/var/spack/environments/mom5
+          cp spack.lock mom5.original.spack.lock
+
+      - name: See if mom5.original.spack.lock exists
+        run: cat $SPACK_ROOT/var/spack/environments/mom5/mom5.original.spack.lock
+
+      - name: Generate force-concretized lockfile
+        if: failure()
         run: |
-          spack env list
+          cd $SPACK_ROOT/var/spack/environments/mom5
+          spack -d concretize --force
+          cp spack.lock mom5.force.spack.lock
+
+      - name: Upload lockfiles
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: lockfile-output
+          path: $SPACK_ROOT/var/spack/environments/mom5/mom5.*.spack.lock
+
