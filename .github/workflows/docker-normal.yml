@@ -9,8 +9,20 @@ jobs:
       - name: run docker container
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u CodeGat --password-stdin
-          docker run -it --rm ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest
+          docker run --rm ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest
           ls
+
+      - name: run docker container
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u CodeGat --password-stdin
+          docker run -i --rm ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest /bin/bash -s <<EOT
+          cd $SPACK_ROOT/var/spack/environments/mom5
+          spack env activate mom5
+          cp spack.lock mom5.original.spack.lock
+          spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
+          spack -d install --reuse-deps
+          cp spack.lock mom5.force.spack.lock
+          EOT
 
       - name: check steps
         run: |
