@@ -28,8 +28,8 @@ jobs:
       #     spack -d install --reuse-deps
       #     cp spack.lock mom5.force.spack.lock
 
-      - name: See if mom5.original.spack.lock exists
-        run: cat $SPACK_ROOT/var/spack/environments/mom5/mom5.original.spack.lock
+    - name: See if mom5.original.spack.lock exists
+      run: cat $SPACK_ROOT/var/spack/environments/mom5/mom5.original.spack.lock
 
       # - name: Generate force-concretized lockfile
       #   if: failure()
