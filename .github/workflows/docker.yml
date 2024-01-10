@@ -10,11 +10,10 @@ jobs:
       credentials:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
-      options: --interactive --tty
     steps:
       - name: activate and install spack
         run: |
-          . $SPACK_ROOT/share/spack/docker/entrypoint.bash interactive-shell
+          . $SPACK_ROOT/share/spack/docker/entrypoint.bash docker-shell
           cd $SPACK_ROOT/var/spack/environments/mom5
           spack env activate mom5
           cp spack.lock mom5.original.spack.lock
@@ -28,7 +27,7 @@ jobs:
       - name: Generate force-concretized lockfile
         if: failure()
         run: |
-          . $SPACK_ROOT/share/spack/docker/entrypoint.bash interactive-shell
+          . $SPACK_ROOT/share/spack/docker/entrypoint.bash docker-shell
           cd $SPACK_ROOT/var/spack/environments/mom5
           spack env activate mom5
           spack -d concretize --force
