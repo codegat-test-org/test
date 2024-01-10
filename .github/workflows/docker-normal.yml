@@ -9,12 +9,6 @@ jobs:
       - name: run docker container
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u CodeGat --password-stdin
-          docker run --rm ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest
-          ls
-
-      - name: run docker container
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u CodeGat --password-stdin
           docker run -i --rm ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest /bin/bash -s <<EOT
           cd $SPACK_ROOT/var/spack/environments/mom5
           spack env activate mom5
