@@ -16,7 +16,8 @@ jobs:
       run: |
         . $SPACK_ROOT/share/spack/setup-env.sh
         spack find
-        spack env activate mom5
+        spack load /lkzqdml
+        spack -d env activate mom5
         spack find
       # - name: activate and install spack
       #   run: |
