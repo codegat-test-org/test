@@ -11,16 +11,16 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
       options: --interactive --tty
-      volumes:
-        - /opt/lockfile_vol:/lockfiles
+      # volumes:
+      #   - /opt/lockfile_vol:/lockfiles
     steps:
     - name: activate and install spack
       run: |
         . $SPACK_ROOT/share/spack/setup-env.sh
         spack load intel-oneapi-compilers@2021.2.0
-        cp $SPACK_ROOT/var/spack/environments/mom5/spack.yaml /lockfiles/some.spack.yaml
+        cp $SPACK_ROOT/var/spack/environments/mom5/spack.yaml $SPACK_ROOT/some.spack.yaml
     - name: upload
       uses: actions/upload-artifact@v3
       with:
         name: output
-        path: /opt/lockfile_vol/some.spack.yaml
+        path: /opt/spack/some.spack.yaml
