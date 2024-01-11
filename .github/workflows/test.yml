@@ -16,17 +16,9 @@ jobs:
       run: |
         . $SPACK_ROOT/share/spack/setup-env.sh
         spack load intel-oneapi-compilers@2021.2.0
-        spack compiler find
-        spack env activate mom5
-        spack find --show-concretized --long
-        echo "------------------------------------------------------------------------------"
-        spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
-        spack concretize --reuse
-        spack find --show-concretized --long
-        echo "------------------------------------------------------------------------------"
-        spack install
-
-
-    - name: See if mom5.original.spack.lock exists
-      run: cat $SPACK_ROOT/some.spack.yaml
-
+        cp $SPACK_ROOT/var/spack/environments/mom5/spack.yaml $SPACK_ROOT/some.spack.yaml
+    - name: upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: output
+        path: $SPACK_ROOT/some.spack.yaml
