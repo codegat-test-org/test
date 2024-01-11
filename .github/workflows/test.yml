@@ -20,7 +20,7 @@ jobs:
         spack env activate mom5
         spack find --show-concretized --long
         echo "------------------------------------------------------------------------------"
-        spack change --match-spec mom5 mom5@git.$GH_REF%intel@2021.2.0 arch=linux-rocky8-x86_64
+        spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
         spack concretize --reuse
         spack find --show-concretized --long
         echo "------------------------------------------------------------------------------"
