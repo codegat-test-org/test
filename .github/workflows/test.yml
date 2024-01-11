@@ -15,9 +15,12 @@ jobs:
         - /lockfiles:/lockfiles
     steps:
     - name: activate and install spack
+      env:
+        PACKAGE_NAME: mom5
+        SPACK_YAML_LOCATION: $SPACK_ROOT/var/spack/environments/${{ env.PACKAGE_NAME }}
       run: |
         . $SPACK_ROOT/share/spack/setup-env.sh
-        spack load ${{ matrix.compiler.package }}@${{ matrix.compiler.version }}
+        spack load intel-oneapi-compilers@2021.2.0
         spack compiler find
         spack env activate ${{ env.PACKAGE_NAME }}
         spack find --show-concretized --long
