@@ -16,13 +16,17 @@ jobs:
       run: |
         . $SPACK_ROOT/share/spack/setup-env.sh
         echo "-----------------------------------------------------------------------"
+        spack -d compilers
         spack load intel-oneapi-compilers@2021.2.0
-        spack find --loaded
+        spack -d compilers
         echo "-----------------------------------------------------------------------"
         spack env activate mom5
-        spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
-        spack -d install --reuse-deps
-        spack find
+        spack -d compilers
+
+      # spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
+      # spack -d install --reuse-deps
+      # spack find
+
       # - name: activate and install spack
       #   run: |
       #     . $SPACK_ROOT/share/spack/setup-env.sh
