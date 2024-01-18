@@ -1,8 +1,0 @@
-name: JSON
-on:
-  workflow_dispatch:
-jobs:
-  validate:
-    uses: codegat-test-org/actions/.github/workflows/validate-json.yml@main
-    with:
-      src: config

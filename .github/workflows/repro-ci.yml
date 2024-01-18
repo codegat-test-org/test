@@ -1,0 +1,40 @@
+name: Repro Checks
+on:
+  workflow_call:
+    inputs:
+      model-name:
+        type: string
+        required: true
+        description: The name of the model to check for reproducibility
+      config-tag:
+        type: string
+        required: true
+        description: A tag on an associated config branch to use for the reproducibility run
+    outputs:
+      artifact-name:
+        value: ${{ jobs.repro.outputs.artifact-name }}
+        description: Name of the artifact containing the checksums for this repro run
+env:
+  CHECKSUMS_LOCAL_LOCATION: /opt/checksums
+jobs:
+  repro:
+    name: Run ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.artifact.outputs.name }}
+    steps:
+      - name: Copy tests, move to deployment, get checksums, output them
+        run: |
+          echo "1234" > ${{ env.CHECKSUMS_LOCAL_LOCATION }}/CHECKSUM
+          sleep 10
+
+      - name: Generate Checksum Artifact Name
+        id: artifact
+        run: echo "name=${{ inputs.model-name }}-${{ inputs.config-tag }}" >> $GITHUB_OUTPUT
+
+      - name: Upload Checksum Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          if-no-files-found: error
+          path: ${{ env.CHECKSUMS_LOCAL_LOCATION }}
