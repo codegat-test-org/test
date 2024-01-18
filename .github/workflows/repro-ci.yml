@@ -23,6 +23,8 @@ jobs:
     outputs:
       artifact-name: ${{ steps.artifact.outputs.name }}
     steps:
+      - run: mkdir -p ${{ env.CHECKSUMS_LOCAL_LOCATION }}
+
       - name: Copy tests, move to deployment, get checksums, output them
         run: |
           echo "1234" > ${{ env.CHECKSUMS_LOCAL_LOCATION }}/CHECKSUM
