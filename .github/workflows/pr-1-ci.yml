@@ -10,9 +10,10 @@ on:
 jobs:
   repro-ci:
     # run the given config and upload the checksums
-    uses: codegat-test-org/test/.github/workflows/repro-ci.yml@release-test
+    uses: codegat-test-org/actions/.github/workflows/checks.yml@main
     with:
       model-name: access-om2
+      environment-name: test
       config-tag: ${{ github.ref_name }}
 
   check-repro:
@@ -43,7 +44,7 @@ jobs:
 
       - name: Check Reproducibility
         id: check
-        uses: ./.github/actions/check-repro@release-test
+        uses: codegat-test-org/actions/.github/actions/checksum-check@main
         with:
           checksum-location: ${{ env.CHECKSUM_LOCAL_LOCATION }}
 
