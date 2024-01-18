@@ -43,7 +43,7 @@ jobs:
 
       - name: Check Reproducibility
         id: check
-        uses: ./.github/actions/check-repro
+        uses: ./.github/actions/check-repro@release-test
         with:
           checksum-location: ${{ env.CHECKSUM_LOCAL_LOCATION }}
 
