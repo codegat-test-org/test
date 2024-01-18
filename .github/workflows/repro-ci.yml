@@ -32,7 +32,7 @@ jobs:
 
       - name: Generate Checksum Artifact Name
         id: artifact
-        run: echo "name=${{ inputs.model-name }}-${{ inputs.config-tag }}" >> $GITHUB_OUTPUT
+        run: echo "name=$(echo '${{ inputs.model-name }}-${{ inputs.config-tag }}' | tr '/' '-')" >> $GITHUB_OUTPUT
 
       - name: Upload Checksum Artifact
         uses: actions/upload-artifact@v3
