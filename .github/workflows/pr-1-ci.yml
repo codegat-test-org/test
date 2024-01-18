@@ -37,12 +37,13 @@ jobs:
         # This is used to have a link to correct config branch to find
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.base_ref }}
+          ref: release-test
+          fetch-depth: 0
           fetch-tags: true
 
       - name: Check Reproducibility
         id: check
-        uses: codegat-test-org/test/.github/actions/check-repro@release-test
+        uses: ./.github/actions/check-repro
         with:
           checksum-location: ${{ env.CHECKSUM_LOCAL_LOCATION }}
 
