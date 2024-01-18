@@ -37,7 +37,7 @@ jobs:
         # This is used to have a link to correct config branch to find
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.base_ref }}
           fetch-tags: true
 
       - name: Check Reproducibility
@@ -52,17 +52,16 @@ jobs:
           git commit -am "Updated Checksums"
           git push
 
-  successful-repro:
-    name: Successful Reproduction
+  result:
+    name: Reproduction Result Notifier
     needs:
       - check-repro
-    if: needs.check-repro.outputs.result == 'true'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
-      - name: Release Comment
-        if: startsWith(github.ref_name, 'release-')
+      - name: Successful Release Comment
+        if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'release-')
         uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
         with:
           message: |
@@ -70,24 +69,15 @@ jobs:
             Consider bumping the minor version of access-om2.
             To bump the version, comment `!bump minor`.
 
-      - name: Dev Comment
-        if: startsWith(github.ref_name, 'dev-')
+      - name: Successful Dev Comment
+        if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'dev-')
         uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
         with:
           message: |
             :white_check_mark: The Bitwise Reproducibility check succeeded when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Dev config. :white_check_mark:
 
-  failed-repro:
-    name: Failed Reproduction
-    needs:
-      - check-repro
-    if: needs.check-repro.outputs.result == 'false'
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Release Comment
-        if: startsWith(github.ref_name, 'release-')
+      - name: Failed Release Comment
+        if: needs.check-repro.outputs.result == 'false' && startsWith(github.ref_name, 'release-')
         uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
         with:
           message: |
@@ -95,8 +85,8 @@ jobs:
             Consider bumping the major version of access-om2 to account for this.
             To bump the version, comment `!bump major`.
 
-      - name: Dev Comment
-        if: startsWith(github.ref_name, 'dev-')
+      - name: Failed Dev Comment
+        if: needs.check-repro.outputs.result == 'failed' && startsWith(github.ref_name, 'dev-')
         uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
         with:
           message: |
