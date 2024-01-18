@@ -10,7 +10,7 @@ on:
 jobs:
   repro-ci:
     # run the given config and upload the checksums
-    uses: ./.github/workflows/repro-ci.yml
+    uses: codegat-test-org/test/.github/workflows/repro-ci.yml@release-test
     with:
       model-name: access-om2
       config-tag: ${{ github.ref_name }}
@@ -33,7 +33,7 @@ jobs:
           name: ${{ needs.repro-ci.outputs.artifact-name }}
           path: ${{ env.CHECKSUM_LOCAL_LOCATION }}
 
-      - name: Checkout Last Config at ${{ github.ref_name }}
+      - name: Checkout Last Config at ${{ github.base_ref }}
         # This is used to have a link to correct config branch to find
         uses: actions/checkout@v4
         with:
