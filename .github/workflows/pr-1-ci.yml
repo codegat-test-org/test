@@ -55,9 +55,11 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           mv ${{ env.CHECKSUM_LOCAL_LOCATION }}/CHECKSUM CHECKSUM
+          git status
           git config user.name github-actions
           git config user.email github-actions@github.com
           git commit -am "Updated Checksums as part of ${{ env.RUN_URL }}"
+          git log
           git push
 
   result:
@@ -70,7 +72,7 @@ jobs:
     steps:
       - name: Successful Release Comment
         if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'release-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :white_check_mark: The Bitwise Reproducibility check succeeded when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Release config. :white_check_mark:
@@ -79,14 +81,14 @@ jobs:
 
       - name: Successful Dev Comment
         if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'dev-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :white_check_mark: The Bitwise Reproducibility check succeeded when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Dev config. :white_check_mark:
 
       - name: Failed Release Comment
         if: needs.check-repro.outputs.result == 'false' && startsWith(github.ref_name, 'release-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :x: The Bitwise Reproducibility check failed when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Release config. :x:
@@ -95,7 +97,7 @@ jobs:
 
       - name: Failed Dev Comment
         if: needs.check-repro.outputs.result == 'failed' && startsWith(github.ref_name, 'dev-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :warning: The Bitwise Reproducibility check failed when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Dev config. :warning:
