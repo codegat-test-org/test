@@ -51,6 +51,7 @@ jobs:
           checksum-location: ${{ env.CHECKSUM_LOCAL_LOCATION }}
 
       - name: Move, Commit and Push Updated Checksum
+        if: steps.check.outputs.result == 'false'
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
