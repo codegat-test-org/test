@@ -49,10 +49,11 @@ jobs:
           checksum-location: ${{ env.CHECKSUM_LOCAL_LOCATION }}
 
       - name: Move, Commit and Push Updated Checksum
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          ls ${{ env.CHECKSUM_LOCAL_LOCATION }}
-          mv ${{ env.CHECKSUM_LOCAL_LOCATION }} CHECKSUM
-          git commit -am "Updated Checksums"
+          mv ${{ env.CHECKSUM_LOCAL_LOCATION }}/CHECKSUM CHECKSUM
+          git commit -am "Updated Checksums as part of ${{ env.RUN_URL }}"
           git push
 
   result:
