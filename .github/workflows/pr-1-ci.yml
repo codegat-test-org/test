@@ -22,6 +22,8 @@ jobs:
     needs:
       - repro-ci
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       CHECKSUM_LOCAL_LOCATION: /opt/checksums
     outputs:
@@ -53,6 +55,8 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           mv ${{ env.CHECKSUM_LOCAL_LOCATION }}/CHECKSUM CHECKSUM
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git commit -am "Updated Checksums as part of ${{ env.RUN_URL }}"
           git push
 
