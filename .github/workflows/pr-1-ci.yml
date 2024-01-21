@@ -50,6 +50,7 @@ jobs:
 
       - name: Move, Commit and Push Updated Checksum
         run: |
+          ls ${{ env.CHECKSUM_LOCAL_LOCATION }}
           mv ${{ env.CHECKSUM_LOCAL_LOCATION }} CHECKSUM
           git commit -am "Updated Checksums"
           git push
