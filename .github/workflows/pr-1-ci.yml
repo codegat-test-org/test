@@ -75,7 +75,7 @@ jobs:
       - name: test checking conditions
         run: echo "result=${{ needs.check-repro.outputs.result }} at ${{ needs.check-repro.outputs.ground-truth-version }}, ref_name=${{ github.ref_name }}"
       - name: Successful Release Comment
-        if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'release-')
+        if: needs.check-repro.outputs.result == 'true' && startsWith(github.base_ref, 'release-')
         uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
@@ -84,14 +84,14 @@ jobs:
             To bump the version, comment `!bump minor`.
 
       - name: Successful Dev Comment
-        if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'dev-')
+        if: needs.check-repro.outputs.result == 'true' && startsWith(github.base_ref, 'dev-')
         uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :white_check_mark: The Bitwise Reproducibility check succeeded when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Dev config. :white_check_mark:
 
       - name: Failed Release Comment
-        if: needs.check-repro.outputs.result == 'false' && startsWith(github.ref_name, 'release-')
+        if: needs.check-repro.outputs.result == 'false' && startsWith(github.base_ref, 'release-')
         uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
@@ -100,7 +100,7 @@ jobs:
             To bump the version, comment `!bump major`.
 
       - name: Failed Dev Comment
-        if: needs.check-repro.outputs.result == 'failed' && startsWith(github.ref_name, 'dev-')
+        if: needs.check-repro.outputs.result == 'failed' && startsWith(github.base_ref, 'dev-')
         uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
