@@ -22,6 +22,8 @@ jobs:
     needs:
       - repro-ci
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       CHECKSUM_LOCAL_LOCATION: /opt/checksums
     outputs:
@@ -38,7 +40,7 @@ jobs:
         # This is used to have a link to correct config branch to find
         uses: actions/checkout@v4
         with:
-          ref: release-test
+          ref: ${{ github.base_ref }}
           fetch-depth: 0
           fetch-tags: true
 
@@ -49,9 +51,17 @@ jobs:
           checksum-location: ${{ env.CHECKSUM_LOCAL_LOCATION }}
 
       - name: Move, Commit and Push Updated Checksum
+        if: steps.check.outputs.result == 'false'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          mv ${{ env.CHECKSUM_LOCAL_LOCATION }} CHECKSUM
-          git commit -am "Updated Checksums"
+          mv ${{ env.CHECKSUM_LOCAL_LOCATION }}/CHECKSUM CHECKSUM
+          git checkout ${{ github.head_ref }}
+          git status
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -am "Updated Checksums as part of ${{ env.RUN_URL }}"
+          git log
           git push
 
   result:
@@ -62,9 +72,11 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - name: test checking conditions
+        run: echo "result=${{ needs.check-repro.outputs.result }} at ${{ needs.check-repro.outputs.ground-truth-version }}, ref_name=${{ github.ref_name }}"
       - name: Successful Release Comment
-        if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'release-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        if: needs.check-repro.outputs.result == 'true' && startsWith(github.base_ref, 'release-')
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :white_check_mark: The Bitwise Reproducibility check succeeded when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Release config. :white_check_mark:
@@ -72,15 +84,15 @@ jobs:
             To bump the version, comment `!bump minor`.
 
       - name: Successful Dev Comment
-        if: needs.check-repro.outputs.result == 'true' && startsWith(github.ref_name, 'dev-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        if: needs.check-repro.outputs.result == 'true' && startsWith(github.base_ref, 'dev-')
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :white_check_mark: The Bitwise Reproducibility check succeeded when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Dev config. :white_check_mark:
 
       - name: Failed Release Comment
-        if: needs.check-repro.outputs.result == 'false' && startsWith(github.ref_name, 'release-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        if: needs.check-repro.outputs.result == 'false' && startsWith(github.base_ref, 'release-')
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :x: The Bitwise Reproducibility check failed when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Release config. :x:
@@ -88,8 +100,8 @@ jobs:
             To bump the version, comment `!bump major`.
 
       - name: Failed Dev Comment
-        if: needs.check-repro.outputs.result == 'failed' && startsWith(github.ref_name, 'dev-')
-        uses: thollander/actions-comment-pull-request@1d3973d  #v2.4.3
+        if: needs.check-repro.outputs.result == 'failed' && startsWith(github.base_ref, 'dev-')
+        uses: thollander/actions-comment-pull-request@1d3973dc4b8e1399c0620d3f2b1aa5e795465308  #v2.4.3
         with:
           message: |
             :warning: The Bitwise Reproducibility check failed when comparing against ${{ needs.check-repro.outputs.ground-truth-version }} for this Dev config. :warning:
