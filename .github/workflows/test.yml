@@ -6,15 +6,15 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - uses: actions/checkout@v4
+
       - name: Comment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          PKG: 1.2.3
-          CFG: 3.2.1
           BODY: |
-            This ${{ github.repository }} model will be deployed using:
-            * `spack packages` [`${{ env.PKG }}`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/${{ env.PKG }})
-            * `spack-config` [`${{ env.CFG }}`](https://github.com/ACCESS-NRI/spack-config/releases/tag/${{ env.CFG }})
+            This model will be deployed using:
+            * `spack packages` [`1.23`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/1.23)
+            * `spack-config` [`3.21`](https://github.com/ACCESS-NRI/spack-config/releases/tag/3.21)
             If this is not what was expected, commit changes to `config/versions.json`.
         run: gh pr comment --edit-last --body '${{ env.BODY }}'
