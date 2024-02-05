@@ -17,4 +17,4 @@ jobs:
             * `spack packages` [`${{ env.PKG }}`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/${{ env.PKG }})
             * `spack-config` [`${{ env.CFG }}`](https://github.com/ACCESS-NRI/spack-config/releases/tag/${{ env.CFG }})
             If this is not what was expected, commit changes to `config/versions.json`.
-        run: gh pr comment --edit-last --body "${{ env.BODY }}"
+        run: gh pr comment --edit-last --body '${{ env.BODY }}'
