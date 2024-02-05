@@ -8,8 +8,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: |
-          gh pr checkout ${{ github.event.pull_request.number }}
+      - uses: actions/checkout@v4
+        with:
+          repository: codegat-test-org/configs
+          path: configs
 
       - name: Comment
         env:
@@ -18,4 +20,6 @@ jobs:
             * `spack packages` [`1.23`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/1.23)
             * `spack-config` [`3.21`](https://github.com/ACCESS-NRI/spack-config/releases/tag/3.21)
             If this is not what was expected, commit changes to `config/versions.json`.
-        run: gh pr comment --body '${{ env.BODY }}'
+        run: |
+          gh pr checkout ${{ github.event.pull_request.number }}
+          gh pr comment --body '${{ env.BODY }}'
