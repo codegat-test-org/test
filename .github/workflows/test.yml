@@ -15,6 +15,7 @@ jobs:
 
       - name: Comment
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BODY: |
             This model will be deployed using:
             * `spack packages` [`1.23`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/1.23)
