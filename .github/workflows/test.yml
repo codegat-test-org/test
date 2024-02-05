@@ -3,9 +3,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GH_REPO: ${{ github.repository }}
     permissions:
       pull-requests: write
     steps:
