@@ -1,42 +1,20 @@
 on:
-  workflow_dispatch:
+  pull_request:
 jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
-      packages: read
-    env:
-      PACKAGE_NAME: mom5
-    container:
-      image: ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-      options: --interactive --tty
-      volumes:
-        - /lockfiles:/lockfiles
+      pull-requests: write
     steps:
-    - name: activate and install spack
+      - name: Comment
       env:
-        SPACK_YAML_LOCATION: $SPACK_ROOT/var/spack/environments/${{ env.PACKAGE_NAME }}
-      run: |
-        . $SPACK_ROOT/share/spack/setup-env.sh
-        spack load intel-oneapi-compilers@2021.2.0
-        spack compiler find
-        spack env activate ${{ env.PACKAGE_NAME }}
-        spack find --show-concretized --long
-        cp ${{ env.SPACK_YAML_LOCATION }}/spack.yaml /lockfiles/generic.spack.yaml
-        cp ${{ env.SPACK_YAML_LOCATION }}/spack.lock /lockfiles/generic.spack.lock
-        echo "------------------------------------------------------------------------------"
-        spack change --match-spec ${{ env.PACKAGE_NAME }} ${{ env.PACKAGE_NAME }}@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
-        spack concretize --reuse
-        spack find --show-concretized --long
-        cp ${{ env.SPACK_YAML_LOCATION }}/spack.yaml /lockfiles/current.spack.yaml
-        cp ${{ env.SPACK_YAML_LOCATION }}/spack.lock /lockfiles/current.spack.lock
-        echo "------------------------------------------------------------------------------"
-        spack install
-    - name: upload
-      uses: actions/upload-artifact@v3
-      with:
-        name: output
-        path: /lockfiles/*.spack.*
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+        PKG: 1.2.3
+        CFG: 3.2.1
+        BODY: |
+          This ${{ github.repository }} model will be deployed using:
+          * `spack packages` [`${{ env.PKG }}`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/${{ env.PKG }})
+          * `spack-config` [`${{ env.CFG }}`](https://github.com/ACCESS-NRI/spack-config/releases/tag/${{ env.CFG }})
+          If this is not what was expected, commit changes to `config/versions.json`.
+      run: gh pr comment --edit-last --body ${{ env.BODY }}
