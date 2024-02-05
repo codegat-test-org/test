@@ -3,15 +3,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     permissions:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
+      - run: |
+          git branch
+          gh pr list
+
       - name: Comment
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
           BODY: |
             This model will be deployed using:
             * `spack packages` [`1.23`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/1.23)
