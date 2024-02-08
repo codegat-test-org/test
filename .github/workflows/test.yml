@@ -12,7 +12,10 @@ jobs:
           git config user.email github-actions@github.com
           git tag tag-test-1
           git push --tags
+          echo "hi" >> README.md
+          git commit -am "Updated readme.md"
+          git push
 
       - run: |
-          git tag tag-test-1
-          git push --tags
+          git tag tag-test-1 -f
+          git push --tags -f
