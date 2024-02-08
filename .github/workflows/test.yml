@@ -3,6 +3,16 @@ on:
 jobs:
   yq:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-      - run: yq '.package.name' meta.yaml
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag tag-test-1
+          git push --tags
+
+      - run: |
+          git tag tag-test-1
+          git push --tags
