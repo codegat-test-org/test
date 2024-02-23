@@ -1,0 +1,17 @@
+on:
+  workflow_dispatch:
+    inputs:
+      commit-checksums:
+        type: boolean
+        required: true
+jobs:
+  commit-em-stringy:
+    if: inputs.commit-checksums == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Succeeded when stringy"
+  commit-em-bool:
+    if: inputs.commit-checksums
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Succeeded when booly"
