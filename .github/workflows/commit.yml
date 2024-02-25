@@ -4,7 +4,7 @@ on:
       tag:
         type: string
 jobs:
-  commit-and-tag:
+  current:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -26,5 +26,61 @@ jobs:
       - name: Tag
         run: |
           git tag ${{ inputs.tag }}
+          git push --tags
+          echo "::notice::Pushed new tag ${{ inputs.tag }}"
+
+  user-id-and-bot:
+    needs:
+      - current
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test-commit-tag-branch
+
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          date >> datefile.txt
+          git add .
+          git commit -m "Some commit"
+          git push
+          echo "::notice::Committed and pushed"
+
+      - name: Tag
+        run: |
+          git tag ${{ inputs.tag }}-1
+          git push --tags
+          echo "::notice::Pushed new tag ${{ inputs.tag }}"
+
+  user-id-and-bot-for-both:
+    needs:
+      - user-id-and-bot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test-commit-tag-branch
+
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          date >> datefile.txt
+          git add .
+          git commit -m "Some commit"
+          git push
+          echo "::notice::Committed and pushed"
+
+      - name: Tag
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git tag ${{ inputs.tag }}-2
           git push --tags
           echo "::notice::Pushed new tag ${{ inputs.tag }}"
