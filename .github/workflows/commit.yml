@@ -1,0 +1,30 @@
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+jobs:
+  commit-and-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test-commit-tag-branch
+
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          date >> datefile.txt
+          git add .
+          git commit -m "Some commit"
+          git push
+          echo "::notice::Committed and pushed"
+
+      - name: Tag
+        run: |
+          git tag ${{ inputs.tag }}
+          git push --tags
+          echo "::notice::Pushed new tag ${{ inputs.tag }}"
