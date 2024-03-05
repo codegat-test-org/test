@@ -24,7 +24,7 @@ jobs:
 
       - name: Check Target
         run: |
-          if [[ "${{ startsWith(github.head_ref, 'release-') }}" == "false" ]]; then
+          if [[ "${{ startsWith(github.base_ref, 'release-') }}" == "false" ]]; then
             echo "::error::Target branch ${{ github.base_ref }} doesn't match 'release-*'"
             exit 1
           fi
