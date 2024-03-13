@@ -33,7 +33,8 @@ jobs:
           versioning-scheme: semver-major-minor
           bump-type: major
 
-      - run: |
+      - if: always()
+        run: |
           echo "${{ steps.bump-cal-minor.outputs.before }}"
           echo "${{ steps.bump-cal-minor.outputs.after }}"
           echo "${{ steps.bump-cal-minor.outputs.type }}"
