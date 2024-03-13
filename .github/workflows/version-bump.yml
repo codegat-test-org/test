@@ -19,6 +19,13 @@ jobs:
           versioning-scheme: calver-minor
           bump-type: major
 
+      - id: bump-cal-current
+        uses: codegat-test-org/actions/.github/actions/bump-version@main
+        with:
+          version: 2024.01.2
+          versioning-scheme: calver-minor
+          bump-type: current
+
       - id: bump-sem-minor
         uses: codegat-test-org/actions/.github/actions/bump-version@main
         with:
@@ -36,10 +43,11 @@ jobs:
       - if: always()
         run: |
           echo "${{ steps.bump-cal-minor.outputs.before }}"
-          echo "${{ steps.bump-cal-minor.outputs.after }}"
+          echo " calver minor bump: ${{ steps.bump-cal-minor.outputs.after }}"
           echo "${{ steps.bump-cal-minor.outputs.type }}"
 
-          echo "${{ steps.bump-cal-major.outputs.after }}"
+          echo "calver major bump: ${{ steps.bump-cal-major.outputs.after }}"
+          echo "calver current bump: ${{ steps.bump-cal-current.outputs.after }}"
 
           echo "${{ steps.bump-sem-minor.outputs.after }}"
 
