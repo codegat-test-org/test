@@ -1,0 +1,45 @@
+name: Version Bump Test
+on:
+  workflow_dispatch:
+jobs:
+  bump-things:
+    runs-on: ubuntu-latest
+    steps:
+      - id: bump-cal-minor
+        uses: codegat-test-org/actions/.github/actions/bump-version@main
+        with:
+          version: 2024.01.2
+          versioning-scheme: calver-minor
+          bump-type: minor
+
+      - id: bump-cal-major
+        uses: codegat-test-org/actions/.github/actions/bump-version@main
+        with:
+          version: 2024.01.2
+          versioning-scheme: calver-minor
+          bump-type: major
+
+      - id: bump-sem-minor
+        uses: codegat-test-org/actions/.github/actions/bump-version@main
+        with:
+          version: 12.33
+          versioning-scheme: semver-major-minor
+          bump-type: minor
+
+      - id: bump-sem-major
+        uses: codegat-test-org/actions/.github/actions/bump-version@main
+        with:
+          version: 12.33
+          versioning-scheme: semver-major-minor
+          bump-type: major
+
+      - run: |
+          echo "${{ steps.bump-cal-minor.outputs.before }}"
+          echo "${{ steps.bump-cal-minor.outputs.after }}"
+          echo "${{ steps.bump-cal-minor.outputs.type }}"
+
+          echo "${{ steps.bump-cal-major.outputs.after }}"
+
+          echo "${{ steps.bump-sem-minor.outputs.after }}"
+
+          echo "${{ steps.bump-sem-major.outputs.after }}"
