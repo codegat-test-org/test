@@ -31,14 +31,12 @@ jobs:
         run: pip install -r ./pytest/test/requirements.txt
 
       - name: Invoke Simple CI Pytests
-        # Use the following shell so we do not exit after pytest failure
-        shell: bash {0}
+        continue-on-error: true
         run: |
           cd pr
-          pytest ../pytest/test/test_config.py
-            -m 'config and metadata'
+          pytest ../pytest/test/test_config.py \
+            -m 'config and metadata' \
             --junitxml=./test_report.xml
-          ls
 
       - name: Parse Test Report
         id: tests
