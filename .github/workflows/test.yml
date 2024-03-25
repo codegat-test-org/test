@@ -31,7 +31,8 @@ jobs:
         run: pip install -r ./pytest/test/requirements.txt
 
       - name: Invoke Simple CI Pytests
-        continue-on-error: true
+        # Use the following shell so we do not exit after pytest failure
+        shell: bash {0}
         run: |
           cd pr
           pytest ../pytest/test/test_config.py
