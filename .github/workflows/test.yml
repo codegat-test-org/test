@@ -28,7 +28,7 @@ jobs:
           cache: pip
 
       - name: Install requirements.txt
-        run: pip install -r ./test/requirements.txt
+        run: pip install -r ./pytest/test/requirements.txt
 
       - name: Invoke Simple CI Pytests
         run: |
