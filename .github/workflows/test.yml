@@ -5,6 +5,8 @@ jobs:
     # Run quick, non-HPC tests on the runner.
     name: Simple CI checks
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
     steps:
       - uses: actions/checkout@v4
         with:
