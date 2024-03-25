@@ -25,6 +25,7 @@ jobs:
           --junitxml=test_report.xml
 
       - name: Parse Test Report
+        if: success() || failure()
         id: tests
         uses: EnricoMi/publish-unit-test-result-action/composite@e780361cd1fc1b1a170624547b3ffda64787d365  #v2.12.0
         with:
