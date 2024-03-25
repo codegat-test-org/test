@@ -1,5 +1,9 @@
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        required: true
 jobs:
   simple-ci:
     # Run quick, non-HPC tests on the runner.
@@ -8,9 +12,22 @@ jobs:
     permissions:
       checks: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          path: pr
+
+      - name: Checkout Tests
+        uses: actions/checkout@v4
         with:
           ref: main
+          path: pytest
+
+      - name: DEBUG
+        run: |
+          ls
+          tree ..
 
       - uses: actions/setup-python@v5
         with:
@@ -22,9 +39,12 @@ jobs:
 
       - name: Invoke Simple CI Pytests
         run: |
+          pwd
           pytest ./test/test_config.py
-          -m 'config and metadata'
-          --junitxml=test_report.xml
+            -m 'config or metadata'
+            --junitxml=test_report.xml
+          ls
+          tree ..
 
       - name: Parse Test Report
         if: success() || failure()
