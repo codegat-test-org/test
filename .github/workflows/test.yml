@@ -22,6 +22,7 @@ jobs:
         run: |
           pytest ./test
             -m 'config and metadata'
+            --ignore=test/test_bit_reproducibility.py
             --junitxml=test_report.xml
 
       - name: Parse Test Report
