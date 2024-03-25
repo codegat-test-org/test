@@ -69,3 +69,6 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "metadata: mark tests as metadata.yaml-related tests"
     )
+    config.addinivalue_line(
+        "markers", "highres: mark tests as high-res-related tests"
+    )
