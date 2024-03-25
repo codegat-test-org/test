@@ -34,7 +34,11 @@ jobs:
         continue-on-error: true
         run: |
           cd pr
-          pytest -vv ../pytest/test/test_config.py -m 'config and metadata' --junitxml=./test_report.xml
+          pytest ../pytest/test/test_config.py \
+            -m 'config or metadata' \
+            --junitxml=./test_report.xml
+          pwd
+          tree
 
       - name: Parse Test Report
         id: tests
