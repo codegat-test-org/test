@@ -12,22 +12,15 @@ jobs:
     permissions:
       checks: write
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ github.base_ref }}
           path: pr
 
-      - name: Checkout Tests
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
           path: pytest
-
-      - name: DEBUG
-        run: |
-          ls
-          tree ..
 
       - uses: actions/setup-python@v5
         with:
@@ -39,12 +32,10 @@ jobs:
 
       - name: Invoke Simple CI Pytests
         run: |
-          pwd
-          pytest ./test/test_config.py
-            -m 'config or metadata'
-            --junitxml=test_report.xml
-          ls
-          tree ..
+          pytest ./pytest/test/test_config.py
+            -m 'config and metadata'
+            --control-path=./pr
+            --junitxml=./test_report.xml
 
       - name: Parse Test Report
         if: success() || failure()
