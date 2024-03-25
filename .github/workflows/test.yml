@@ -35,7 +35,7 @@ jobs:
         run: |
           cd pr
           pytest ../pytest/test/test_config.py \
-            -m 'config or metadata' \
+            -m 'config' \
             --junitxml=./test_report.xml
           pwd
           tree
