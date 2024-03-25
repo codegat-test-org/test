@@ -32,10 +32,9 @@ jobs:
 
       - name: Invoke Simple CI Pytests
         run: |
-          tree
-          pytest ./pytest/test/test_config.py
+          cd pr
+          pytest ../pytest/test/test_config.py
             -m 'config and metadata'
-            --control-path=./pr
             --junitxml=./test_report.xml
 
       - name: Parse Test Report
