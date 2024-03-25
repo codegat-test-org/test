@@ -34,15 +34,16 @@ jobs:
         continue-on-error: true
         run: |
           cd pr
-          pytest ../pytest/test/test_config.py \
+          pytest -vv ../pytest/test/test_config.py \
             -m 'config and metadata' \
             --junitxml=./test_report.xml
+          tree
 
       - name: Parse Test Report
         id: tests
         uses: EnricoMi/publish-unit-test-result-action/composite@e780361cd1fc1b1a170624547b3ffda64787d365  #v2.12.0
         with:
-          files: ./test_report.xml
+          files: ./pr/test_report.xml
           comment_mode: off
           check_run: true
           compare_to_earlier_commit: false
