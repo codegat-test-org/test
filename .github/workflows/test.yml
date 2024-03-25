@@ -20,11 +20,9 @@ jobs:
 
       - name: Invoke Simple CI Pytests
         run: |
-          pytest ./test
-            -m 'config and metadata'
-            --ignore=test/test_bit_reproducibility.py
-            --ignore=test/test/test_access_om2_extract_checksums.py
-            --junitxml=test_report.xml
+          pytest ./test/test_config.py
+          -m 'config and metadata'
+          --junitxml=test_report.xml
 
       - name: Parse Test Report
         id: tests
