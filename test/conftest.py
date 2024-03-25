@@ -63,9 +63,9 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "test: mark tests as testing test functionality"
     )
-    config.addinvalue_line(
+    config.addinivalue_line(
         "markers", "config: mark tests as configuration-related tests"
     )
-    config.addinvalue_line(
+    config.addinivalue_line(
         "markers", "metadata: mark tests as metadata.yaml-related tests"
     )
