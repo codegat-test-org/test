@@ -11,5 +11,6 @@ jobs:
       - uses: access-nri/actions/.github/actions/react-to-comment@react-to-comment-action
         with:
           reaction: rocket
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - run: echo "WOW!!!!!!!!!!!!"
