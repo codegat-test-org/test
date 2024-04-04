@@ -7,6 +7,8 @@ jobs:
   do-stuff:
     if: startsWith(github.event.comment.body, '!bump')
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: access-nri/actions/.github/actions/react-to-comment@react-to-comment-action
         with:
