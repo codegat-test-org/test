@@ -19,6 +19,7 @@ jobs:
         with:
           pr: ${{ github.event.issue.number }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          edit-last: true
           comment: |
             Wow, what a comment! We have
             new
