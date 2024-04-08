@@ -6,7 +6,10 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: access-nri/actions/.github/actions/pr-comment@pr-comment-action
+      - uses: access-nri/build-cd/.github/actions/validate-repo-version@access-om3-2-generify-repo-check
         with:
-          comment: |
-            a really cool comment!!
+          repos-to-check: spack-packages spack-config
+
+      - uses: access-nri/build-cd/.github/actions/validate-repo-version@access-om3-2-generify-repo-check
+        with:
+          repos-to-check: spack-packages
