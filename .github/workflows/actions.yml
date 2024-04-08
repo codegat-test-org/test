@@ -1,5 +1,5 @@
 on:
-  pull_request:
+  workflow_dispatch:
 jobs:
   do-stuff:
     runs-on: ubuntu-latest
