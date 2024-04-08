@@ -6,10 +6,15 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: access-nri/build-cd/.github/actions/validate-repo-version@access-om3-2-generify-repo-check
+      - id: both
+        uses: access-nri/build-cd/.github/actions/validate-repo-version@access-om3-2-generify-repo-check
         with:
           repos-to-check: spack-packages spack-config
+
+      - run: echo "::notice::sp ${{ steps.both.outputs.spack-packages-version }} sc ${{ steps.both.outputs.spack-config-version }}"
 
       - uses: access-nri/build-cd/.github/actions/validate-repo-version@access-om3-2-generify-repo-check
         with:
           repos-to-check: spack-packages
+
+      - run: echo "::notice::sp ${{ steps.both.outputs.spack-packages-version }} sc ${{ steps.both.outputs.spack-config-version }}"
