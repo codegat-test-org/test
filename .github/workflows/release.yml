@@ -1,0 +1,35 @@
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: number
+        required: true
+        description: tag
+      branch:
+        type: string
+        required: true
+        description: branch
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git tag ${{ inputs.tag }}
+          git push --tags
+
+      - name: Create Release
+        env:
+          TAG: ${{ inputs.tag }}
+          IS_REPRO_BREAK: ${{ endsWith(inputs.tag, '.0') && 'DOES' || 'does not' }}
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  #v0.1.15
+        with:
+          tag_name: ${{ env.TAG }}
+          target_commitish: ${{ inputs.branch }}
+          name: Configuration ${{ env.TAG }}
+          body: |
+            This released configuration ${{ env.IS_REPRO_BREAK }} break reproducibility with released configurations before it. See the 'Config Tags' section in the `README.md` for more information.
+          generate_release_notes: true
