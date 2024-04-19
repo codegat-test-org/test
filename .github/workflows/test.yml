@@ -1,52 +1,13 @@
 on:
   workflow_dispatch:
     inputs:
-      branch:
+      thing:
         type: string
         required: true
+        default: yay
 jobs:
-  simple-ci:
-    # Run quick, non-HPC tests on the runner.
-    name: Simple CI checks
-    runs-on: ubuntu-latest
-    permissions:
-      checks: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
-          path: pr
+  a:
+    uses: codegat-test-org/test/.github/workflows/call.yml@main
+    with:
+      another-thing: ${{ inputs.thing }}
 
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          path: pytest
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-          cache: pip
-
-      - name: Install requirements.txt
-        run: pip install -r ./pytest/test/requirements.txt
-
-      - name: Invoke Simple CI Pytests
-        continue-on-error: true
-        run: |
-          cd pr
-          pytest ../pytest/test/test_config.py \
-            -m 'config' \
-            --junitxml=./test_report.xml
-          pwd
-          tree
-
-      - name: Parse Test Report
-        id: tests
-        uses: EnricoMi/publish-unit-test-result-action/composite@e780361cd1fc1b1a170624547b3ffda64787d365  #v2.12.0
-        with:
-          files: ./pr/test_report.xml
-          comment_mode: off
-          check_run: true
-          compare_to_earlier_commit: false
-          report_individual_runs: true
-          report_suite_logs: any
