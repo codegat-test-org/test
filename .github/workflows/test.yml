@@ -1,13 +1,7 @@
 on:
   workflow_dispatch:
-    inputs:
-      thing:
-        type: string
-        required: true
-        default: yay
 jobs:
   a:
-    uses: codegat-test-org/test/.github/workflows/call.yml@main
-    with:
-      another-thing: ${{ inputs.thing }}
-
+    runs-on: ubuntu-latest
+    steps:
+      - run: jsonschema --version
