@@ -4,4 +4,22 @@ jobs:
   a:
     runs-on: ubuntu-latest
     steps:
-      - run: jsonschema --version
+    # Checkout the `schema-repo`
+    - uses: actions/checkout@v4
+      with:
+        repository: access-nri/schema
+        path: schema
+
+    # Checkout the callers `spack.yaml`
+    - uses: actions/checkout@v4
+      with:
+        repository: access-nri/access-om2
+        path: data
+
+    - uses: GrantBirki/json-yaml-validate@v2.7.1
+      with:
+        mode: fail
+        files: data/spack.yaml
+        json_schema: schema/au.org.access-nri/model/spack/environment/deployment/1-0-0.json
+        yaml_as_json: true
+        ajv_strict_mode: false
