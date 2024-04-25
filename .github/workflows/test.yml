@@ -15,6 +15,11 @@ jobs:
       with:
         repository: access-nri/access-om2
 
+    - run: |
+        ls
+        echo "-----------"
+        ls ..
+
     - uses: GrantBirki/json-yaml-validate@v2.7.1
       with:
         mode: fail
