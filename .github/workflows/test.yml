@@ -19,6 +19,8 @@ jobs:
         ls
         echo "-----------"
         ls ..
+        echo "-----------"
+        ls ../..
 
     - uses: GrantBirki/json-yaml-validate@v2.7.1
       with:
