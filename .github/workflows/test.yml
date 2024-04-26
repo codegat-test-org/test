@@ -16,13 +16,11 @@ jobs:
         repository: access-nri/access-om2
         path: data
 
-    - run: tree ..
-
     - uses: GrantBirki/json-yaml-validate@v2.7.1
       with:
         mode: fail
-        base_dir: data
-        files: spack.yaml
+        files: |
+          data/spack.yaml
         json_schema: schema/au.org.access-nri/model/spack/environment/deployment/1-0-0.json
         yaml_as_json: true
         ajv_strict_mode: false
