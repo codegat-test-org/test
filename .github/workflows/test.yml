@@ -8,7 +8,8 @@ jobs:
     # Checkout the callers `spack.yaml`
     - uses: actions/checkout@v4
       with:
-        repository: access-nri/access-om2
+        repository: access-nri/access-om3
+        ref: 3-spack-yaml-versioning
 
     # Checkout the `schema-repo`
     - uses: actions/checkout@v4
