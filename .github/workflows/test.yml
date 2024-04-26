@@ -23,7 +23,7 @@ jobs:
         mode: fail
         base_dir: data
         files: spack.yaml
-        json_schema: ../schema/au.org.access-nri/model/spack/environment/deployment/1-0-0.json
+        json_schema: schema/au.org.access-nri/model/spack/environment/deployment/1-0-0.json
         yaml_as_json: true
         ajv_strict_mode: false
         use_gitignore: false
