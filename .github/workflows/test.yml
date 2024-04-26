@@ -16,11 +16,7 @@ jobs:
         repository: access-nri/access-om2
 
     - run: |
-        ls
-        echo "-----------"
-        ls ..
-        echo "-----------"
-        ls ../..
+        tree ../../
 
     - uses: GrantBirki/json-yaml-validate@v2.7.1
       with:
