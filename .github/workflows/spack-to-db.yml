@@ -20,7 +20,7 @@ jobs:
       - deploy
     runs-on: ubuntu-latest
     env:
-      METADATA_PATH: /metadata
+      METADATA_PATH: /opt/metadata
     outputs:
       url: ${{ steps.release.outputs.url }}
       created-at: ${{ steps.metadata.outputs.created-at }}
@@ -56,7 +56,7 @@ jobs:
       - release
     runs-on: ubuntu-latest
     env:
-      METADATA_PATH: /metadata
+      METADATA_PATH: /opt/metadata
     steps:
       - name: Download Metadata Artifact
         uses: actions/download-artifact@v4
