@@ -75,6 +75,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+          cache: pip
 
       - name: Upload Build Metadata
-        run: ./scripts/upload-build-metadata.bash ${{ needs.release.outputs.url }} ${{ needs.release.outputs.created-at }} ${{ env.METADATA_PATH }} access-om2 mom5 cice5 oasis3-mct libaccessom2
+        run: |
+          pip install -r ./tools/release_prevenance/requirements.txt
+          ./scripts/upload-build-metadata.bash ${{ needs.release.outputs.url }} ${{ needs.release.outputs.created-at }} ${{ env.METADATA_PATH }} access-om2 mom5 cice5 oasis3-mct libaccessom2
