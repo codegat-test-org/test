@@ -1,0 +1,18 @@
+{
+  "access-om2@git.2024.03.0=2024.03.0": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/access-om2-git.2024.03.0=2024.03.0-ucmkt2gy72vvikhstgvoft65wnskr7rd",
+  "cice5@git.2023.10.19=2023.10.19": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/cice5-git.2023.10.19=2023.10.19-v3zncpqjj2gyseudbwiudolcjq3k3leo",
+  "cmake@3.24.2": "/apps/cmake/3.24.2",
+  "datetime-fortran@1.7.0": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/datetime-fortran-1.7.0-aretozixwsdz42owabgzeiuxooyxrspg",
+  "gmake@4.4.1":  "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/gmake-4.4.1-ugorlm6e6s5hkwsandqvyrdtwwq3mckf",
+  "hdf5@1.14.1-2": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/hdf5-1.14.1-2-a6mpuk7tw5e4pyukxwalooc7jfldalcf",
+  "json-fortran@8.3.0": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/json-fortran-8.3.0-nyxvikkez6fu64xtbeqqz2a4wngikfgi",
+  "libaccessom2@git.2023.10.26=2023.10.26": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/libaccessom2-git.2023.10.26=2023.10.26-ltfg7jcn6t4cefotvj3kjnyu5nru26xo",
+  "mom5@git.2023.11.09=2023.11.09": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/mom5-git.2023.11.09=2023.11.09-qji4nlmr6utrribaiyhewe4je6mifguz",
+  "netcdf-c@4.7.4": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/netcdf-c-4.7.4-i3inxzaihefr3rqljoovhyevwai6bsff",
+  "netcdf-fortran@4.5.2": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/netcdf-fortran-4.5.2-mnx4gghyb5gngsl3fgosud6k72yu2u6a",
+  "oasis3-mct@git.2023.11.09=2023.11.09": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/oasis3-mct-git.2023.11.09=2023.11.09-sh2anmtjrygzixya2fjc3p7cg4o5wc5h",
+  "openmpi@4.0.2": "/apps/openmpi/4.0.2",
+  "parallelio@2.5.2": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/parallelio-2.5.2-nwolfzy2xxb4wub65gmvlm3edhuolmlh",
+  "pkgconf@1.9.5": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/pkgconf-1.9.5-uyq7tvpnuuo3gosnplkvuxktaeeipuqk",
+  "zlib@1.2.13": "/g/data/vk83/apps/spack/0.20/release/linux-rocky8-x86_64/intel-19.0.5.281/zlib-1.2.13-arj4bfz33zf63gvfionhorrrveci6kb4"
+}
