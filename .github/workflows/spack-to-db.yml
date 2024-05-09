@@ -35,7 +35,7 @@ jobs:
 
       - name: Create Release
         id: release
-        uses: softprops/action-gh-release@v0.1.15
+        uses: softprops/action-gh-release@69320dbe05506a9a39fc8ae11030b214ec2d1f87
         with:
           tag_name: kool
           name: neat release
@@ -74,7 +74,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: "3.10"
 
       - name: Upload Build Metadata
         run: ./scripts/upload-build-metadata.bash ${{ needs.release.outputs.url }} ${{ needs.release.outputs.created-at }} ${{ env.METADATA_PATH }} access-om2 mom5 cice5 oasis3-mct libaccessom2
