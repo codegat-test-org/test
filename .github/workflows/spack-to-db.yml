@@ -79,5 +79,5 @@ jobs:
 
       - name: Upload Build Metadata
         run: |
-          pip install -r ./tools/release_prevenance/requirements.txt
+          pip install -r ./tools/release_provenance/requirements.txt
           ./scripts/upload-build-metadata.bash ${{ needs.release.outputs.url }} ${{ needs.release.outputs.created-at }} ${{ env.METADATA_PATH }} access-om2 mom5 cice5 oasis3-mct libaccessom2
