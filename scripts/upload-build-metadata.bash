@@ -52,6 +52,8 @@ for pkg in "${packages[@]}"; do
       release_url: $release_url
     }' "$json_dir/spack.lock" > package.json
 
+  cat package.json
+
   python ./tools/release_provenance/save_release.py package.json
   echo "Uploaded $pkg to build DB"
 done
