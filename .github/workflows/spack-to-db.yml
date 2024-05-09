@@ -19,6 +19,8 @@ jobs:
     needs:
       - deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       METADATA_PATH: /opt/metadata
     outputs:
