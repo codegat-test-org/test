@@ -16,9 +16,6 @@ inputs:
 runs:
   using: composite
   steps:
-      # Checkout the callers repository to access the data being checked
-    - uses: actions/checkout@v4
-
     # Checkout the `schema-repo`
     - uses: actions/checkout@v4
       with:
