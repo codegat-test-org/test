@@ -16,14 +16,17 @@ inputs:
 runs:
   using: composite
   steps:
+
+    # Checkout the callers repository to access the data being checked
+    - uses: actions/checkout@v4
+      with:
+        path: caller
+
     # Checkout the `schema-repo`
     - uses: actions/checkout@v4
       with:
         repository: access-nri/schema
         path: schema
-
-    # Checkout the callers repository to access the data being checked
-    - uses: actions/checkout@v4
 
     - shell: bash
       run: tree ..
@@ -42,7 +45,7 @@ runs:
       with:
         mode: fail
         files: |
-          ${{ inputs.data-location }}
+          caller/${{ inputs.data-location }}
         json_schema: schema/${{ inputs.schema-location }}/${{ inputs.schema-version }}.json
         yaml_as_json: ${{ steps.data.outputs.yaml }}
         ajv_strict_mode: false
