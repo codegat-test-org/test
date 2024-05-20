@@ -25,11 +25,11 @@ runs:
         repository: access-nri/schema
         path: schema
 
+    # Checkout the callers repository to access the data being checked
+    - uses: actions/checkout@v4
+
     - shell: bash
       run: tree ..
-
-      # Checkout the callers repository to access the data being checked
-    - uses: actions/checkout@v4
 
     - name: Check data extension
       shell: bash
