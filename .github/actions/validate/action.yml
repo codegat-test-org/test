@@ -20,12 +20,13 @@ runs:
     - uses: actions/checkout@v4
       with:
         repository: access-nri/schema
+        path: schema
         sparse-checkout: |
           ${{ inputs.schema-location }}/${{ inputs.schema-version }}.json
         sparse-checkout-cone-mode: false
 
     - shell: bash
-      run: tree .
+      run: tree ..
 
     - name: Check data extension
       shell: bash
@@ -42,7 +43,7 @@ runs:
         mode: fail
         files: |
           ${{ inputs.data-location }}
-        json_schema: ${{ inputs.schema-version }}.json
+        json_schema: schema/${{ inputs.schema-location }}/${{ inputs.schema-version }}.json
         yaml_as_json: ${{ steps.data.outputs.yaml }}
         ajv_strict_mode: false
         use_gitignore: false
