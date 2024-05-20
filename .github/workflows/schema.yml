@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: codegat-test-org/test/.github/workflows/actions/validate@main
+      - uses: codegat-test-org/test/.github/actions/validate@main
         with:
           schema-location: au.org.access-nri/model/deployment/config/versions
           schema-version: 2-0-0
@@ -16,7 +16,7 @@ jobs:
   validate-without-checkout:
     runs-on: ubuntu-latest
     steps:
-      - uses: codegat-test-org/test/.github/workflows/actions/validate@main
+      - uses: codegat-test-org/test/.github/actions/validate@main
         with:
           schema-location: au.org.access-nri/model/deployment/config/versions
           schema-version: 2-0-0
@@ -25,7 +25,7 @@ jobs:
   validate-with-correct-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: codegat-test-org/test/.github/workflows/actions/validate@main
+      - uses: codegat-test-org/test/.github/actions/validate@main
         with:
           schema-location: au.org.access-nri/model/deployment/config/versions
           schema-version: 1-0-0
