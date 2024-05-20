@@ -16,6 +16,14 @@ inputs:
 runs:
   using: composite
   steps:
+    # Ensure that the calling workflow has checked out an appropriate git repository.
+    - shell: bash
+      run: |
+        if ! git status; then
+          echo "::error::Calling repository not checked out. Failing..."
+          exit 1
+        fi
+
     # Checkout the `schema-repo`
     - uses: actions/checkout@v4
       with:

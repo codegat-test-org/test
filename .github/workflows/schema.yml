@@ -10,7 +10,7 @@ jobs:
       - uses: codegat-test-org/test/.github/actions/validate@main
         with:
           schema-location: au.org.access-nri/model/deployment/ config/versions
-          schema-version: 2-0-0
+          schema-version: 1-0-0
           data-location: config/versions.json
 
   validate-without-checkout:
@@ -25,6 +25,7 @@ jobs:
   validate-with-correct-version:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: codegat-test-org/test/.github/actions/validate@main
         with:
           schema-location: au.org.access-nri/model/deployment/ config/versions
