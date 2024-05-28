@@ -4,6 +4,8 @@ jobs:
   a:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - id: output1
         run: |
           ./scripts/send-output.bash
