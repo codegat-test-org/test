@@ -4,26 +4,13 @@ jobs:
   a:
     runs-on: ubuntu-latest
     steps:
+      - id: output1
+        run: |
+          ./scripts/send-output.bash
 
-    # Checkout the callers `spack.yaml`
-    - uses: actions/checkout@v4
-      with:
-        repository: access-nri/access-om3
-        ref: 3-spack-yaml-versioning
+      - id: output2
+        run: |
+          ./scripts/send-output.bash
 
-    # Checkout the `schema-repo`
-    - uses: actions/checkout@v4
-      with:
-        repository: access-nri/schema
-        path: schema
-
-
-    - uses: GrantBirki/json-yaml-validate@v2.7.1
-      with:
-        mode: fail
-        files: |
-          spack.yaml
-        json_schema: schema/au.org.access-nri/model/spack/environment/deployment/1-0-0.json
-        yaml_as_json: true
-        ajv_strict_mode: false
-        use_gitignore: false
+      - run: |
+          echo "the output was ${{ steps.output1.outputs.something }} and ${{ steps.output2.outputs.something }}"
