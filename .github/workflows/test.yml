@@ -3,16 +3,9 @@ on:
 jobs:
   a:
     runs-on: ubuntu-latest
+    env:
+      MY_JOB_ENV: Hello
     steps:
-      - uses: actions/checkout@v4
-
-      - id: output1
-        run: |
-          ./scripts/send-output.bash
-
-      - id: output2
-        run: |
-          ./scripts/send-output.bash
-
-      - run: |
-          echo "the output was ${{ steps.output1.outputs.something }} and ${{ steps.output2.outputs.something }}"
+      - env:
+          MY_VAR_AS_ENV: ${{ vars.MY_VAR }}
+        run: env
