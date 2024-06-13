@@ -10,13 +10,13 @@ jobs:
       - name: Setup Issue Variables
         id: variables
         run: |
-          config="access-om2-configs"
-          echo "config=${config}" >> $GITHUB_OUTPUT
-          echo "config-url=https://github.com/ACCESS-NRI/${config}" >> $GITHUB_OUTPUT
+          config=access-om2-configs
+          echo "config=$config" >> $GITHUB_OUTPUT
+          echo "config-url=https://github.com/ACCESS-NRI/$config" >> $GITHUB_OUTPUT
           # model is just the config repo name without the '-configs' bit, so split it below with bash param expansion
-          model="${config%-*}"
-          echo "model=${model}" >> $GITHUB_OUTPUT
-          echo "model-url=https://github.com/ACCESS-NRI/${model}" >> $GITHUB_OUTPUT
+          model=${config%-*}
+          echo "model=$model" >> $GITHUB_OUTPUT
+          echo "model-url=https://github.com/ACCESS-NRI/$model" >> $GITHUB_OUTPUT
           echo "tag-url=https://github.com/ACCESS-NRI/access-om2-configs/releases/tag/${{ needs.check-checksum.outputs.compared-checksum-version }}" >> GITHUB_OUTPUT
           echo "run-url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
 
