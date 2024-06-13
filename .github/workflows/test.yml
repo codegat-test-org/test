@@ -20,7 +20,7 @@ jobs:
           echo "tag-url=https://github.com/ACCESS-NRI/access-om2-configs/releases/tag/${{ needs.check-checksum.outputs.compared-checksum-version }}" >> GITHUB_OUTPUT
           echo "run-url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
 
-          echo $GITHUB_OUTPUT
+          cat $GITHUB_OUTPUT
 
       - name: Create issue
         env:
