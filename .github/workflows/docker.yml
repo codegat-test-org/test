@@ -11,5 +11,5 @@ jobs:
         uses: access-nri/actions/.github/actions/docker-build-push@main
         with:
           container-registry: ghcr.io
-          image-name: codegat-test-org/test-image
+          image-name: codegat-test-org/test-image-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasssssssssssssssssssssssssssssssccccccccccccccccccccccccccc
           dockerfile-name: Dockerfile.test
