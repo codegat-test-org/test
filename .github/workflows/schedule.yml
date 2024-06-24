@@ -1,8 +1,0 @@
-name: schedule
-on:
-  schedule:
-jobs:
-  a:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo Hi!
