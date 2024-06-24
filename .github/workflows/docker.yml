@@ -1,56 +1,12 @@
 on:
   workflow_dispatch:
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      packages: read
-    container:
-      image: ghcr.io/access-nri/build-access-om2-intel2021.2.0-2024.01.02:latest
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-      options: --interactive --tty
     steps:
-    - name: activate and install spack
-      run: |
-        . $SPACK_ROOT/share/spack/setup-env.sh
-        spack load intel-oneapi-compilers@2021.2.0
-        spack env activate mom5
-        spack find --show-concretized --long
-
-        echo "------------------------------------------------------------------------------"
-        spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
-        spack concretize --reuse
-        spack find --show-concretized --long
-        echo "------------------------------------------------------------------------------"
-        spack install --reuse
-
-      # - name: activate and install spack
-      #   run: |
-      #     . $SPACK_ROOT/share/spack/setup-env.sh
-      #     spack env activate mom5
-      #     cd $SPACK_ROOT/var/spack/environments/mom5
-      #     cp spack.lock mom5.original.spack.lock
-      #     spack change --match-spec mom5 mom5@git.2023.11.09%intel@2021.2.0 arch=linux-rocky8-x86_64
-      #     spack -d install --reuse-deps
-      #     cp spack.lock mom5.force.spack.lock
-
-    - name: See if mom5.original.spack.lock exists
-      run: cat $SPACK_ROOT/var/spack/environments/mom5/mom5.original.spack.lock
-
-      # - name: Generate force-concretized lockfile
-      #   if: failure()
-      #   run: |
-      #     . $SPACK_ROOT/share/spack/setup-env.sh
-      #     cd $SPACK_ROOT/var/spack/environments/mom5
-      #     spack env activate mom5
-      #     spack -d concretize --force
-      #     cp spack.lock mom5.force.spack.lock
-
-      # - name: Upload lockfiles
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: lockfile-output
-      #     path: $SPACK_ROOT/var/spack/environments/mom5/mom5.*.spack.lock
-
+      - name: Building
+        uses: access-nri/actions/.github/actions/docker-build-push@main
+        with:
+          container-registry: ghcr.io
+          image-name: codegat-test-org/test-image
+          dockerfile-name: Dockerfile.test
