@@ -8,8 +8,8 @@ jobs:
       contents: read
     steps:
       - name: Building
-        uses: access-nri/actions/.github/actions/docker-build-push@main
+        uses: access-nri/actions/.github/actions/docker-build-push@170-intermittent-push-fail
         with:
           container-registry: ghcr.io
-          image-name: codegat-test-org/test-image-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasssssssssssssssssssssssssssssssccccccccccccccccccccccccccc
+          image-name: codegat-test-org/test-image-i-think
           dockerfile-name: Dockerfile.test
