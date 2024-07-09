@@ -13,3 +13,4 @@ jobs:
           container-registry: ghcr.io
           image-name: codegat-test-org/test-image-i-think
           dockerfile-name: Dockerfile.test
+          push: true
