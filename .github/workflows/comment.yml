@@ -10,16 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-    env:
-      WHY_REPRO_FAILED: ${{ inputs.compared-checksum-version != '' && format('when comparing against `{0}`', inputs.compared-checksum-version) || 'as we could not find an earlier checksum' }}
-      COMPARED_CHECKSUM_STRING: ${{ inputs.compared-checksum-version != '' && format('The checksums compared against are found here {0}/{1}/tree/{2}/testing/checksum', github.server_url, github.repository, inputs.compared-checksum-version) || '' }}
     steps:
       - name: Failed Repro Comment
         uses: access-nri/actions/.github/actions/pr-comment@main
         with:
           pr: 17
           comment: |
-            :x: The Bitwise Reproducibility check failed ${{ env.WHY_REPRO_FAILED }} :x:
+            :x: The Bitwise Reproducibility check failed ${{ inputs.compared-checksum-version != '' && format('when comparing against `{0}`', inputs.compared-checksum-version) || 'as we could not find an earlier checksum' }} :x:
             You must bump the major version of this configuration - to bump the version, comment `!bump major`or modify the `version` in `metadata.yaml`. The meaning of these version bumps is explained in the README.md, under `Config Tags`.
 
             <details>
@@ -27,5 +24,5 @@ jobs:
 
             The experiment can be found on Gadi at `location`, and the test results at somewhere/else.
             The checksums generated in this PR are found in the `testing/checksum` directory of http://example.org.
-            ${{ env.COMPARED_CHECKSUM_STRING }}
+            ${{ inputs.compared-checksum-version != '' && format('The checksums compared against are found here {0}/{1}/tree/{2}/testing/checksum', github.server_url, github.repository, inputs.compared-checksum-version) || '' }}
             </details>
