@@ -8,6 +8,8 @@ on:
 jobs:
   comment:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     env:
       WHY_REPRO_FAILED: ${{ inputs.compared-checksum-version != '' && format('when comparing against `{0}`', inputs.compared-checksum-version) || 'as we could not find an earlier checksum' }}
       COMPARED_CHECKSUM_STRING: ${{ inputs.compared-checksum-version != '' && format('The checksums compared against are found here {0}/{1}/tree/{2}/testing/checksum', github.server_url, github.repository, inputs.compared-checksum-version) || '' }}
