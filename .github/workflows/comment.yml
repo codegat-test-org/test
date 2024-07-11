@@ -3,7 +3,8 @@ on:
     inputs:
       compared-checksum-version:
         type: string
-        required: true
+        required: false
+        default: ''
 jobs:
   comment:
     runs-on: ubuntu-latest
