@@ -15,6 +15,7 @@ jobs:
       - name: Failed Repro Comment
         uses: access-nri/actions/.github/actions/pr-comment@main
         with:
+          pr: 17
           comment: |
             :x: The Bitwise Reproducibility check failed ${{ env.WHY_REPRO_FAILED }} :x:
             You must bump the major version of this configuration - to bump the version, comment `!bump major`or modify the `version` in `metadata.yaml`. The meaning of these version bumps is explained in the README.md, under `Config Tags`.
