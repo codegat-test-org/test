@@ -11,6 +11,7 @@ jobs:
       - uses: actions/setup-python@v4
 
       - run: |
+          set +e
           MY_PATH=${{ inputs.compared-config-ref }}
           pip install model-config-tests==0.0.1
           model-config-tests -s -m "checksum" \
@@ -26,6 +27,7 @@ jobs:
       - uses: actions/setup-python@v4
 
       - run: |
+          set +e
           MY_PATH=${{ inputs.compared-config-ref }}
           pip install model-config-tests==0.0.1
           model-config-tests -s -m "checksum" \
