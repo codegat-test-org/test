@@ -1,34 +1,36 @@
 on:
   workflow_dispatch:
+    inputs:
+      compared-config-ref:
+        type: string
+        required: false
 jobs:
-  comment:
+  config-at-end:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
 
-      - uses: access-nri/actions/.github/actions/pr-comment@main
-        with:
-          pr: 12
-          comment: |
-            <details>
+      - run: |
+          MY_PATH=${{ inputs.compared-config-ref }}
+          pip install model-config-tests==0.0.1
+          model-config-tests -s -m "checksum" \
+            --output-path /opt/something \
+            --junitxml=/opt/something/else/test-report.xml \
+            ${{ inputs.compared-config-ref != '' && '--checksum-path $MY_PATH' || '' }}
 
-            <summary>:rocket: Deployment: Release `2024.05.0` (Prerelease `pr5-18`)</summary>
+          echo Wow!
 
-            This `access-esm1.5` model will be deployed as:
-            * `2024.05.0` as a Release (when merged).
-            * `pr5-19` as a Prerelease (during this PR).
+  config-at-middle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
 
-            This Prerelease is accessible on Gadi using `module use /g/data/vk83/prerelease/modules/access-models/ && module load access-esm1p5/pr5-19`, where the binaries shall be on your `$PATH`.
-            This Prerelease is also accessible on Gadi via `/g/data/vk83/prerelease/apps/spack/0.21/spack` in the `access-esm1p5-pr5-19` environment.
-            </details>
-            <details>
-            <summary>:hammer_and_wrench: Config: spack packages `2024.12.30`, spack-config `2022.12.3`</summary>
+      - run: |
+          MY_PATH=${{ inputs.compared-config-ref }}
+          pip install model-config-tests==0.0.1
+          model-config-tests -s -m "checksum" \
+            --output-path /opt/something \
+            ${{ inputs.compared-config-ref != '' && '--checksum-path $MY_PATH \' || '\' }}
+            --junitxml=/opt/something/else/test-report.xml
 
-            It will be deployed using:
-            * `access-nri/spack-packages` version [`2024.05.28`](https://github.com/ACCESS-NRI/spack-packages/releases/tag/2024.05.28)
-            * `access-nri/spack-config` version [`2024.04.23`](https://github.com/ACCESS-NRI/spack-config/releases/tag/2024.04.23)
-
-            If this is not what was expected, commit changes to `config/versions.json`.
-            </details>
+          echo Wow!
