@@ -24,6 +24,7 @@ runs:
   using: composite
   steps:
     - name: Check All Spack Major Versions in Prerelease are in Release
+      id: maj-all-pre-in-rel
       shell: bash
       run: |
         majors_only_in_prerelease=$(jq --compact-output --raw-output \
@@ -38,6 +39,7 @@ runs:
         fi
 
     - name: Check All Spack Major Versions in Release are in Prerelease
+      id: maj-all-rel-in-pre
       shell: bash
       run: |
         majors_only_in_release=$(jq --compact-output --raw-output \
@@ -52,6 +54,7 @@ runs:
         fi
 
     - name: Check All Spack Hash Versions are Equal
+      id: hash-all-equal
       shell: bash
       run: |
         release_version_hashes=$(jq '.deployment.${{ inputs.target }}.Release.spack | to_entries' ${{ inputs.settings-path }})
