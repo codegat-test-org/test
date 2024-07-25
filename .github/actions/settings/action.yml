@@ -52,8 +52,8 @@ runs:
         prerelease_version_hashes=$(jq --compact-output --raw-output '.deployment.${{ inputs.target }}.Prerelease.spack' ${{ inputs.settings-path }})
 
         unequal_hashes_for_version=$(jq --compact-output --raw-output --null-input \
-          --argjson $r "$release_version_hashes" \
-          --argjson $p "$prerelease_version_hashes" \
+          --argjson r "$release_version_hashes" \
+          --argjson p "$prerelease_version_hashes" \
           '$r + $p | group_by(.key)[] | select(.[0].value != .[1].value) | .[0].key'
         )
 
