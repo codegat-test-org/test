@@ -32,7 +32,7 @@ runs:
           msg="Spack versions ${majors_only_in_prerelease} do not exist in Release. Deployments to Release at those versions will not succeed."
           echo "::${{ inputs.error-level }}::$msg"
           echo "msg=$msg" >> $GITHUB_OUTPUT
-        if
+        fi
 
     - name: Check All Spack Major Versions in Release are in Prerelease
       shell: bash
@@ -43,7 +43,7 @@ runs:
           msg="Spack versions ${majors_only_in_release} do not exist in Prerelease. Spack versions in Release should be tested in Prerelease first."
           echo "::${{ inputs.error-level }}::$msg"
           echo "msg=$msg" >> $GITHUB_OUTPUT
-        if
+        fi
 
     - name: Check All Spack Hash Versions are Equal
       shell: bash
