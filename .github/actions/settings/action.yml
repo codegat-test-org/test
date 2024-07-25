@@ -73,6 +73,7 @@ runs:
       id: collector
       shell: bash
       run: |
+        echo "DEBUG: ${{ toJson(steps) }}"
         echo "failures=[${{ join(steps.*.outputs.msg) }}]" >> $GITHUB_OUTPUT
 
     - name: Action Fail from Error
