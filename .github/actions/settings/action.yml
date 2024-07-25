@@ -76,10 +76,9 @@ runs:
       id: collector
       shell: bash
       run: |
-        echo "DEBUG: ${{ toJson(steps.*.outputs.msg) }}"
-        echo "failures=[${{ join(steps.*.outputs.msg) }}]" >> $GITHUB_OUTPUT
+        echo "failures=[${{ fromJson(steps.*.outputs.msg) }}]" >> $GITHUB_OUTPUT
 
     - name: Action Fail from Error
-      if: inputs.error-level == 'error' && join(steps.*.outputs.msg) != ''
+      if: inputs.error-level == 'error' && fromJson(steps.*.outputs.msg) != '[]'
       shell: bash
       run: exit 1
