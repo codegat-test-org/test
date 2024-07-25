@@ -1,38 +1,22 @@
 on:
   workflow_dispatch:
     inputs:
-      compared-config-ref:
+      location:
         type: string
         required: false
+        default: './cd/config/settings.json'
 jobs:
-  config-at-end:
+  validating:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v4
+    - name: Checkout build-cd Config
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        path: cd
 
-      - run: |
-          set +e
-          MY_PATH=${{ inputs.compared-config-ref }}
-          pip install model-config-tests==0.0.1
-          model-config-tests -s -m "checksum" \
-            --output-path /opt/something \
-            --junitxml=/opt/something/else/test-report.xml \
-            ${{ inputs.compared-config-ref != '' && '--checksum-path $MY_PATH' || '' }}
+    - name: Validate build-cd config/settings.json
+      id: validate
+      uses: codegat-test-org/.github/actions/settings@main
 
-          echo Wow!
-
-  config-at-middle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-python@v4
-
-      - run: |
-          set +e
-          MY_PATH=${{ inputs.compared-config-ref }}
-          pip install model-config-tests==0.0.1
-          model-config-tests -s -m "checksum" \
-            --output-path /opt/something \
-            ${{ inputs.compared-config-ref != '' && '--checksum-path $MY_PATH \' || '\' }}
-            --junitxml=/opt/something/else/test-report.xml
-
-          echo Wow!
+    - run: echo "${{ steps.validate.outputs.failures }}"
