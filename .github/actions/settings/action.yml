@@ -26,7 +26,10 @@ runs:
     - name: Check All Spack Major Versions in Prerelease are in Release
       shell: bash
       run: |
-        majors_only_in_prerelease=$(jq '.deployment.${{ inputs.target }} | (.Prerelease.spack | keys) - (.Release.spack | keys)' ${{ inputs.settings-path }})
+        majors_only_in_prerelease=$(jq --compact-output --raw-output \
+          '.deployment.${{ inputs.target }} | (.Prerelease.spack | keys) - (.Release.spack | keys)' \
+          ${{ inputs.settings-path }}
+        )
 
         if [[ "$majors_only_in_prerelease" != "[]" ]]; then
           msg="Spack versions ${majors_only_in_prerelease} do not exist in Release. Deployments to Release at those versions will not succeed."
@@ -37,7 +40,10 @@ runs:
     - name: Check All Spack Major Versions in Release are in Prerelease
       shell: bash
       run: |
-        majors_only_in_release=$(jq '.deployment.${{ inputs.target }} | (.Release.spack | keys) - (.Prerelease.spack | keys)' ${{ inputs.settings-path }})
+        majors_only_in_release=$(jq --compact-output --raw-output \
+          '.deployment.${{ inputs.target }} | (.Release.spack | keys) - (.Prerelease.spack | keys)' \
+          ${{ inputs.settings-path }}
+        )
 
         if [[ "$majors_only_in_release" != "[]" ]]; then
           msg="Spack versions ${majors_only_in_release} do not exist in Prerelease. Spack versions in Release should be tested in Prerelease first."
