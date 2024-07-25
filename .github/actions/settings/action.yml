@@ -54,10 +54,10 @@ runs:
         unequal_hashes_for_version=$(jq --compact-output --raw-output --null-input \
           --argjson r "$release_version_hashes" \
           --argjson p "$prerelease_version_hashes" \
-          '$r + $p | group_by(.key)[] | select(.[0].value != .[1].value) | .[0].key'
+          '$r + $p | [group_by(.key)[] | select(.[0].value != .[1].value) | .[0].key]'
         )
 
-        if [[ "$unequal_hashes_for_version" != "{}" ]]; then
+        if [[ "$unequal_hashes_for_version" != "[]" ]]; then
           msg="Different spack hashes between Prerelease/Release for major versions: ${unequal_hashes_for_version}. These should be equal to ensure equivalent builds."
           echo "::${{ inputs.error-level }}::$msg"
           echo "msg=$msg" >> $GITHUB_OUTPUT
