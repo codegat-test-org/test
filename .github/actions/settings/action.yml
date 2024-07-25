@@ -48,8 +48,8 @@ runs:
     - name: Check All Spack Hash Versions are Equal
       shell: bash
       run: |
-        release_version_hashes=$(jq --compact-output --raw-output '.deployment.${{ inputs.target }}.Release.spack' ${{ inputs.settings-path }})
-        prerelease_version_hashes=$(jq --compact-output --raw-output '.deployment.${{ inputs.target }}.Prerelease.spack' ${{ inputs.settings-path }})
+        release_version_hashes=$(jq '.deployment.${{ inputs.target }}.Release.spack | to_entries' ${{ inputs.settings-path }})
+        prerelease_version_hashes=$(jq '.deployment.${{ inputs.target }}.Prerelease.spack | to_entries' ${{ inputs.settings-path }})
 
         unequal_hashes_for_version=$(jq --compact-output --raw-output --null-input \
           --argjson r "$release_version_hashes" \
