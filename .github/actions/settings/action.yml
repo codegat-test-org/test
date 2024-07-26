@@ -28,7 +28,7 @@ runs:
       shell: bash
       run: |
         majors_only_in_prerelease=$(jq --compact-output --raw-output \
-          '.deployment.${{ inputs.target }} | (.Prerelease.spack | keys) - (.Release.spack | keys) | @sh' \
+          '.deployment.${{ inputs.target }} | (.Prerelease.spack | keys) - (.Release.spack | keys)' \
           ${{ inputs.settings-path }}
         )
 
@@ -43,7 +43,7 @@ runs:
       shell: bash
       run: |
         majors_only_in_release=$(jq --compact-output --raw-output \
-          '.deployment.${{ inputs.target }} | (.Release.spack | keys) - (.Prerelease.spack | keys) | @sh' \
+          '.deployment.${{ inputs.target }} | (.Release.spack | keys) - (.Prerelease.spack | keys)' \
           ${{ inputs.settings-path }}
         )
 
@@ -63,7 +63,7 @@ runs:
         unequal_hashes_for_version=$(jq --compact-output --raw-output --null-input \
           --argjson r "$release_version_hashes" \
           --argjson p "$prerelease_version_hashes" \
-          '$r + $p | [group_by(.key)[] | select(.[0].value != .[1].value) | .[0].key] | @sh'
+          '$r + $p | [group_by(.key)[] | select(.[0].value != .[1].value) | .[0].key]'
         )
 
         if [[ "$unequal_hashes_for_version" != "" ]]; then
