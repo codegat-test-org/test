@@ -76,10 +76,10 @@ runs:
       id: collector
       shell: bash
       run: |
-        echo "${{ fromJson(steps.*.outputs.msg) }}"
-        echo "failures=$(jq -crn --argjson f '${{ fromJson(steps.*.outputs.msg) }}' '$f | join("\n")')" >> $GITHUB_OUTPUT
+        failures_json="${{ toJson(steps.*.outputs.msg) }}"
+        echo "failures=$(jq -crn --argjson f '$failures_json' '$f | join("\n")')" >> $GITHUB_OUTPUT
 
     - name: Action Fail from Error
-      if: inputs.error-level == 'error' && fromJson(steps.*.outputs.msg) != ''
+      if: inputs.error-level == 'error' && toJson(steps.*.outputs.msg) != ''
       shell: bash
       run: exit 1
