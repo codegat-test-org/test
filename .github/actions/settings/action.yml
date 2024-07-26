@@ -28,11 +28,11 @@ runs:
       shell: bash
       run: |
         majors_only_in_prerelease=$(jq --compact-output --raw-output \
-          '.deployment.${{ inputs.target }} | (.Prerelease.spack | keys) - (.Release.spack | keys)' \
+          '.deployment.${{ inputs.target }} | (.Prerelease.spack | keys) - (.Release.spack | keys) | @sh' \
           ${{ inputs.settings-path }}
         )
 
-        if [[ "$majors_only_in_prerelease" != "[]" ]]; then
+        if [[ "$majors_only_in_prerelease" != "" ]]; then
           msg="Spack versions ${majors_only_in_prerelease} do not exist in Release. Deployments to Release at those versions will not succeed."
           echo "::${{ inputs.error-level }}::$msg"
           echo "msg=$msg" >> $GITHUB_OUTPUT
@@ -43,11 +43,11 @@ runs:
       shell: bash
       run: |
         majors_only_in_release=$(jq --compact-output --raw-output \
-          '.deployment.${{ inputs.target }} | (.Release.spack | keys) - (.Prerelease.spack | keys)' \
+          '.deployment.${{ inputs.target }} | (.Release.spack | keys) - (.Prerelease.spack | keys) | @sh' \
           ${{ inputs.settings-path }}
         )
 
-        if [[ "$majors_only_in_release" != "[]" ]]; then
+        if [[ "$majors_only_in_release" != "" ]]; then
           msg="Spack versions ${majors_only_in_release} do not exist in Prerelease. Spack versions in Release should be tested in Prerelease first."
           echo "::${{ inputs.error-level }}::$msg"
           echo "msg=$msg" >> $GITHUB_OUTPUT
@@ -63,10 +63,10 @@ runs:
         unequal_hashes_for_version=$(jq --compact-output --raw-output --null-input \
           --argjson r "$release_version_hashes" \
           --argjson p "$prerelease_version_hashes" \
-          '$r + $p | [group_by(.key)[] | select(.[0].value != .[1].value) | .[0].key]'
+          '$r + $p | [group_by(.key)[] | select(.[0].value != .[1].value) | .[0].key] | @sh'
         )
 
-        if [[ "$unequal_hashes_for_version" != "[]" ]]; then
+        if [[ "$unequal_hashes_for_version" != "" ]]; then
           msg="Different spack hashes between Prerelease/Release for major versions: ${unequal_hashes_for_version}. These should be equal to ensure equivalent builds."
           echo "::${{ inputs.error-level }}::$msg"
           echo "msg=$msg" >> $GITHUB_OUTPUT
