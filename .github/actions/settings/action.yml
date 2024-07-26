@@ -77,7 +77,8 @@ runs:
       shell: bash
       run: |
         echo "${{ toJson(steps.*.outputs.msg) }}"
-        echo "failures=${{ join(steps.*.outputs.msg, "|") }})" >> $GITHUB_OUTPUT
+        echo "${{ join(steps.*.outputs.msg, '\n') }}"
+        echo "failures=${{ join(steps.*.outputs.msg, '\n') }})" >> $GITHUB_OUTPUT
 
     - name: Action Fail from Error
       if: inputs.error-level == 'error' && fromJson(steps.*.outputs.msg) != ''
