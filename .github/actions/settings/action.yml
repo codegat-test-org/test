@@ -75,7 +75,9 @@ runs:
     - name: Warning/Error Collector
       id: collector
       shell: bash
-      run: echo "failures='${{ join(steps.*.outputs.msg, "\n") }}'" >> $GITHUB_OUTPUT
+      run: |
+        echo "${{ toJson(steps.*.outputs.msg) }}"
+        echo "failures=${{ join(steps.*.outputs.msg, "|") }})" >> $GITHUB_OUTPUT
 
     - name: Action Fail from Error
       if: inputs.error-level == 'error' && fromJson(steps.*.outputs.msg) != ''
