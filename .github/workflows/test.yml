@@ -18,5 +18,7 @@ jobs:
     - name: Validate build-cd config/settings.json
       id: validate
       uses: codegat-test-org/test/.github/actions/settings@main
+      with:
+        error-level: error
 
     - run: echo "${{ steps.validate.outputs.failures }}"

@@ -78,6 +78,6 @@ runs:
       run: echo "failures=${{ join(steps.*.outputs.msg) }}" >> $GITHUB_OUTPUT
 
     - name: Action Fail from Error
-      if: inputs.error-level == 'error' && toJson(steps.*.outputs.msg) != ''
+      if: inputs.error-level == 'error' && join(steps.*.outputs.msg) != ''
       shell: bash
       run: exit 1
