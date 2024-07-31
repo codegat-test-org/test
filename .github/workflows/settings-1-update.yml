@@ -102,5 +102,5 @@ jobs:
     with:
       deployment-environment: ${{ matrix.update.deployment-environment }}
       spack-type: ${{ matrix.update.type }}
-      spack-updates: ${{ matrix.update.spack }}  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
+      spack-update: ${{ matrix.update.spack }}  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
     secrets: inherit
