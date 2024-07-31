@@ -72,7 +72,7 @@ jobs:
                 "deployment-environment": $d,
                 "type": .key,
                 "spack": .value.spack
-              }]' ${{ env.CONFIG_SETTINGS_PATH }}
+              }] | @json' ${{ env.CONFIG_SETTINGS_PATH }}
           )
           echo "$update"
           echo "update=$update" >> $GITHUB_OUTPUT
@@ -89,7 +89,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        update: ${{ needs.setup-settings-update.outputs.updates }}
+        update: ${{ fromJson(needs.setup-settings-update.outputs.updates) }}
         # Example of this matrix:
         # update:
         # - deployment-environment: Gadi
