@@ -74,7 +74,10 @@ jobs:
                 "spack": .value.spack
               }]' ${{ env.CONFIG_SETTINGS_PATH }}
           )
+          echo "$update"
           echo "update=$update" >> $GITHUB_OUTPUT
+
+      run: echo "DEBUG ${{ fromJson(steps.info.outputs.update) }}"
 
   settings-update:
     name: Update
