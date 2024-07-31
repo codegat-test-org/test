@@ -77,7 +77,7 @@ jobs:
           echo "$update"
           echo "update=$update" >> $GITHUB_OUTPUT
 
-      run: echo "DEBUG ${{ fromJson(steps.info.outputs.update) }}"
+      - run: echo "DEBUG ${{ fromJson(steps.info.outputs.update) }}"
 
   settings-update:
     name: Update
