@@ -89,6 +89,7 @@ runs:
           eval "set -- $line"
           version=$1
           hash=$2
+          echo "Checking if $hash is in $version"
           if ! git -C ${{ env.CHECKOUT_DIR }} merge-base --is-ancestor $hash releases/v$version; then
             echo "::${{ inputs.error-level }}::Commit $hash does not exist on branch releases/v$version"
             failed=true
