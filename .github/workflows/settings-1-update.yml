@@ -70,12 +70,21 @@ jobs:
           update=$(jq --raw-output --compact-output \
             '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
                 "deployment-environment": $d,
-                "type": .key,
-                "spack": .value.spack
+                "type": .key
               }] | @json' ${{ env.CONFIG_SETTINGS_PATH }}
           )
           echo "$update"
           echo "update=$update" >> $GITHUB_OUTPUT
+
+          # update=$(jq --raw-output --compact-output \
+          #   '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
+          #       "deployment-environment": $d,
+          #       "type": .key,
+          #       "spack": .value.spack
+          #     }] | @json' ${{ env.CONFIG_SETTINGS_PATH }}
+          # )
+          # echo "$update"
+          # echo "update=$update" >> $GITHUB_OUTPUT
 
       - run: |
           echo "DEBUG ${{ steps.info.outputs.update }}"
@@ -108,5 +117,5 @@ jobs:
     with:
       deployment-environment: ${{ matrix.update.deployment-environment }}
       spack-type: ${{ matrix.update.type }}
-      spack-update: ${{ matrix.update.spack }}  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
+      spack-update: ''  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
     secrets: inherit
