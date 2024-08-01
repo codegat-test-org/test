@@ -69,16 +69,18 @@ jobs:
         run: |
           update=$(jq --raw-output --compact-output \
             '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
-                "deployment": $d,
-                "type": .key
-              }] | @json' ${{ env.CONFIG_SETTINGS_PATH }}
+                "deployment-environment": $d,
+                "type": .key,
+                "spack": .value.spack
+              }]' ${{ env.CONFIG_SETTINGS_PATH }}
           )
           echo "$update"
-          echo "update=$update" >> $GITHUB_OUTPUT
+          # Replace all '"' in $update with '\"' so GitHub's fromJson(...) interprets it correctly.
+          echo "update=${update//\"/\\\"}" >> $GITHUB_OUTPUT
 
           # update=$(jq --raw-output --compact-output \
           #   '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
-          #       "deployment": $d,
+          #       "deployment-environment": $d,
           #       "type": .key,
           #       "spack": .value.spack
           #     }] | @json' ${{ env.CONFIG_SETTINGS_PATH }}
@@ -115,7 +117,7 @@ jobs:
         #
     uses: codegat-test-org/test/.github/workflows/settings-2-deploy.yml@main
     with:
-      deployment-environment: ${{ matrix.update.deployment }}
+      deployment-environment: ${{ matrix.update.deployment-environment }}
       spack-type: ${{ matrix.update.type }}
       spack-update: ''  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
     secrets: inherit
