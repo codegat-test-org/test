@@ -97,10 +97,10 @@ jobs:
     if: github.event_name == 'push'
     needs:
       - setup-settings-update
-    strategy:
-      fail-fast: false
-      matrix:
-        update: ${{ fromJson(toJson(needs.setup-settings-update.outputs.updates)) }}
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     update: ${{ fromJson(toJson(needs.setup-settings-update.outputs.updates)) }}
         # Example of this matrix:
         # update:
         # - deployment-environment: Gadi
@@ -115,9 +115,12 @@ jobs:
         #     0.22: 98u928eu9ue
         # etc ...
         #
-    uses: codegat-test-org/test/.github/workflows/settings-2-deploy.yml@main
-    with:
-      deployment-environment: ${{ matrix.update.deployment-environment }}
-      spack-type: ${{ matrix.update.type }}
-      spack-update: ''  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
-    secrets: inherit
+    # uses: codegat-test-org/test/.github/workflows/settings-2-deploy.yml@main
+    # with:
+    #   deployment-environment: ${{ matrix.update.deployment-environment }}
+    #   spack-type: ${{ matrix.update.type }}
+    #   spack-update: ''  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
+    # secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ fromJson(needs.setup-settings-update.outputs.updates) }}"
