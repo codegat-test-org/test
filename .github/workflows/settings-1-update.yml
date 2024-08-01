@@ -77,9 +77,7 @@ jobs:
 
           echo "$update"
           # Replace all '"' in $update with '\"' so GitHub's fromJson(...) interprets it correctly.
-          echo "update<<ENDJSON" >> $GITHUB_OUTPUT
-          echo "${update//\"/\\\"}" >> $GITHUB_OUTPUT
-          echo "ENDJSON" >> $GITHUB_OUTPUT
+          echo "updates=$update" >> $GITHUB_OUTPUT
 
           # update=$(jq --raw-output --compact-output \
           #   '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
@@ -99,7 +97,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        update: ${{ fromJson(needs.setup-settings-update.outputs.updates) }}
+        update: ${{ needs.setup-settings-update.outputs.updates }}
         # Example of this matrix:
         # update:
         # - deployment-environment: Gadi
