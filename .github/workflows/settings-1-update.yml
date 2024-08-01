@@ -74,9 +74,12 @@ jobs:
                 "spack": .value.spack
               }]' ${{ env.CONFIG_SETTINGS_PATH }}
           )
+
           echo "$update"
-          # Replace all '"' in $update with ''' so GitHub's fromJson(...) interprets it correctly.
-          echo "update=${update//\"/\'}" >> $GITHUB_OUTPUT
+          # Replace all '"' in $update with '\"' so GitHub's fromJson(...) interprets it correctly.
+          echo "update<<ENDJSON" >> $GITHUB_OUTPUT
+          echo "${update//\"/\\\"}" >> $GITHUB_OUTPUT
+          echo "ENDJSON" >> $GITHUB_OUTPUT
 
           # update=$(jq --raw-output --compact-output \
           #   '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
@@ -88,39 +91,32 @@ jobs:
           # echo "$update"
           # echo "update=$update" >> $GITHUB_OUTPUT
 
-      - run: |
-          echo "DEBUG ${{ steps.info.outputs.update }}"
-          echo "DEBUG ${{ fromJson(steps.info.outputs.update) }}"
-
   settings-update:
     name: Update
     if: github.event_name == 'push'
     needs:
       - setup-settings-update
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     update: ${{ fromJson(toJson(needs.setup-settings-update.outputs.updates)) }}
-        # Example of this matrix:
-        # update:
-        # - deployment-environment: Gadi
-        #   type: Release
-        #   spack:
-        #     0.20: yhr873y4387
-        #     0.22: 98u928eu9ue
-        # - deployment-environment: Gadi
-        #   type: Prerelease
-        #   spack:
-        #     0.20: yhr873y4387
-        #     0.22: 98u928eu9ue
-        # etc ...
-        #
-    # uses: codegat-test-org/test/.github/workflows/settings-2-deploy.yml@main
-    # with:
-    #   deployment-environment: ${{ matrix.update.deployment-environment }}
-    #   spack-type: ${{ matrix.update.type }}
-    #   spack-update: ''  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
-    # secrets: inherit
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "${{ fromJson(needs.setup-settings-update.outputs.updates) }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        update: ${{ fromJson(toJson(needs.setup-settings-update.outputs.updates)) }}
+        Example of this matrix:
+        update:
+        - deployment-environment: Gadi
+          type: Release
+          spack:
+            0.20: yhr873y4387
+            0.22: 98u928eu9ue
+        - deployment-environment: Gadi
+          type: Prerelease
+          spack:
+            0.20: yhr873y4387
+            0.22: 98u928eu9ue
+        etc ...
+
+    uses: codegat-test-org/test/.github/workflows/settings-2-deploy.yml@main
+    with:
+      deployment-environment: ${{ matrix.update.deployment-environment }}
+      spack-type: ${{ matrix.update.type }}
+      spack-update: ''  # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
+    secrets: inherit
