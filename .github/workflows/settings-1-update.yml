@@ -67,7 +67,7 @@ jobs:
         #  }
         # }
         run: |
-          update=$(jq --raw-output --compact-output \
+          update=$(jq --compact-output \
             '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
                 "deployment-environment": $d,
                 "type": .key,
