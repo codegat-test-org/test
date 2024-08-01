@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        update: ${{ fromJson(toJson(needs.setup-settings-update.outputs.updates)) }}
+        update: ${{ fromJson(needs.setup-settings-update.outputs.updates) }}
         # Example of this matrix:
         # update:
         # - deployment-environment: Gadi
