@@ -100,19 +100,19 @@ jobs:
       fail-fast: false
       matrix:
         update: ${{ fromJson(toJson(needs.setup-settings-update.outputs.updates)) }}
-        Example of this matrix:
-        update:
-        - deployment-environment: Gadi
-          type: Release
-          spack:
-            0.20: yhr873y4387
-            0.22: 98u928eu9ue
-        - deployment-environment: Gadi
-          type: Prerelease
-          spack:
-            0.20: yhr873y4387
-            0.22: 98u928eu9ue
-        etc ...
+        # Example of this matrix:
+        # update:
+        # - deployment-environment: Gadi
+        #   type: Release
+        #   spack:
+        #     0.20: yhr873y4387
+        #     0.22: 98u928eu9ue
+        # - deployment-environment: Gadi
+        #   type: Prerelease
+        #   spack:
+        #     0.20: yhr873y4387
+        #     0.22: 98u928eu9ue
+        # etc ...
 
     uses: codegat-test-org/test/.github/workflows/settings-2-deploy.yml@main
     with:
