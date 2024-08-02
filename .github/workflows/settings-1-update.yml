@@ -79,16 +79,6 @@ jobs:
           # Replace all '"' in $update with '\"' so GitHub's fromJson(...) interprets it correctly.
           echo "updates=$update" >> $GITHUB_OUTPUT
 
-          # update=$(jq --raw-output --compact-output \
-          #   '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
-          #       "deployment-environment": $d,
-          #       "type": .key,
-          #       "spack": .value.spack
-          #     }] | @json' ${{ env.CONFIG_SETTINGS_PATH }}
-          # )
-          # echo "$update"
-          # echo "update=$update" >> $GITHUB_OUTPUT
-
   settings-update:
     name: Update
     if: github.event_name == 'push'
@@ -118,5 +108,5 @@ jobs:
       spack-type: ${{ matrix.update.type }}
       # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
       spack-update: |
-        ${{ fromJson(matrix.update.spack) }}
+        ${{ matrix.update.spack }}
     secrets: inherit
