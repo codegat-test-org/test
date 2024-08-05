@@ -108,5 +108,5 @@ jobs:
       spack-type: ${{ matrix.update.type }}
       # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
       spack-update: |
-        ${{ fromJson(matrix.update).spack }}
+        ${{ matrix.update.spack }}
     secrets: inherit
