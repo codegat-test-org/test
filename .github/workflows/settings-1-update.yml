@@ -71,7 +71,7 @@ jobs:
             '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
                 "deployment-environment": $d,
                 "type": .key,
-                "spack": .value.spack
+                "spack": (.value.spack | @json)
               }]' ${{ env.CONFIG_SETTINGS_PATH }}
           )
 
