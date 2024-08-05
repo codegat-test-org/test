@@ -34,8 +34,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          echo "${{ inputs.spack-update }}"
           versions=$(jq --null-input --compact-output --raw-output \
-            --argjson vs "${{ inputs.spack-update }}" \
+            --argjson vs '${{ inputs.spack-update }}' \
             '$vs | keys | @sh'
           )
           for version in $versions; do
