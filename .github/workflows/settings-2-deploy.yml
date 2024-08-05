@@ -35,8 +35,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "${{ inputs.spack-update }}"
+          echo "${{ fromJson(inputs.spack-update) }}"
+          echo "${{ toJson(inputs.spack-update)}}"
+
           versions=$(jq --null-input --compact-output --raw-output \
-            --argjson vs '${{ inputs.spack-update }}' \
+            --argjson vs '${{ toJson(inputs.spack-update) }}' \
             '$vs | keys | @sh'
           )
           for version in $versions; do
