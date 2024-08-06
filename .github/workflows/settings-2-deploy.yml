@@ -10,10 +10,8 @@ on:
         type: string
         required: true
         description: The type of spack deployment (eg. Prerelease, Release)
-      spack-update:
-        type: string
-        required: true
-        description: "A JSON Object comprising of `'VERSION': 'HASH'` fields"
+env:
+  CONFIG_SETTINGS_PATH: ./config/settings.json
 jobs:
   update-environment:
     name: Update ${{ inputs.deployment-environment }} ${{ inputs.spack-type }} Settings
@@ -30,22 +28,37 @@ jobs:
       #     hosts: ${{ secrets.HOST }}
       #     private-key: ${{ secrets.SSH_KEY }}
 
+      - uses: actions/checkout@v4
+
+      - name: Setup spack updates
+        id: spack
+        # TODO: Since we can't format this json as an input for this job (see the earlier workflow) we need to do it here
+        run: |
+          updates=$(jq --compact-output --raw-output \
+            --arg env "${{ inputs.deployment-environment }}" \
+            --arg type "${{ inputs.spack-type }}" \
+            '.deployment["$env"]["$type"].spack' \
+            ${{ env.CONFIG_SETTINGS_PATH }}
+          )
+          versions=$(jq --null-input --compact-output --raw-output \
+            --argjson vs "$updates" \
+            '$vs | keys | @sh'
+          )
+
+          echo "$updates"
+          echo "$versions"
+
+          echo "updates=$updates" >> $GITHUB_OUTPUT
+          echo "versions=$versions" >> $GITHUB_OUTPUT
+
       - name: Update
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "${{ inputs.spack-update }}"
-          echo "${{ fromJson(inputs.spack-update) }}"
-          echo "${{ toJson(inputs.spack-update)}}"
-
-          versions=$(jq --null-input --compact-output --raw-output \
-            --argjson vs '${{ toJson(inputs.spack-update) }}' \
-            '$vs | keys | @sh'
-          )
-          for version in $versions; do
+          for version in $${{ steps.spack.outputs.versions }}; do
             new_commit=$(jq --null-input --compact-output --raw-output \
               --arg v "$version" \
-              --argjson vs "${{ inputs.spack-update }}" \
+              --argjson vs "${{ steps.spack.outputs.updates }}" \
               '$vs[$v]'
             )
 

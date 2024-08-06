@@ -60,23 +60,17 @@ jobs:
         # later matrix job.
         # A matrix job will need something of the form (but in yaml):
         # {"deployment-environment": "Gadi",
-        #  "type": "Release",
-        #  "spack": {
-        #    "0.21": "yr843y7",
-        #    "0.22": "ar837yr"
-        #  }
+        #  "type": "Release"
         # }
         run: |
           update=$(jq --compact-output \
-            '[.deployment | to_entries[] | .key as $d | .value | to_entries[] | {
+            '[.deployment | to_entries[] | .key as $d | .value | keys[] | {
                 "deployment-environment": $d,
-                "type": .key,
-                "spack": (.value.spack | @json)
+                "type": .
               }]' ${{ env.CONFIG_SETTINGS_PATH }}
           )
 
           echo "$update"
-          # Replace all '"' in $update with '\"' so GitHub's fromJson(...) interprets it correctly.
           echo "updates=$update" >> $GITHUB_OUTPUT
 
   settings-update:
@@ -106,6 +100,4 @@ jobs:
     with:
       deployment-environment: ${{ matrix.update.deployment-environment }}
       spack-type: ${{ matrix.update.type }}
-      # {"0.20": "7r8y43r8", "0.21": "wr7834yr", ...}
-      spack-update: ${{ matrix.update.spack }}
     secrets: inherit
