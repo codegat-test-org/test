@@ -57,6 +57,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set +e
           for version in ${{ steps.spack.outputs.versions }}; do
             new_commit=$(jq --compact-output --raw-output \
               --arg v "$version" \
