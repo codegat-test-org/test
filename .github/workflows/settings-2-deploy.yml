@@ -58,10 +58,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           for version in ${{ steps.spack.outputs.versions }}; do
-            new_commit=$(jq --null-input --compact-output --raw-output \
+            new_commit=$(jq --compact-output --raw-output \
               --arg v "$version" \
-              --argjson vs "${{ steps.spack.outputs.updates }}" \
-              '$vs[$v]'
+              --arg env "${{ inputs.deployment-environment }}" \
+              --arg type "${{ inputs.spack-type }}" \
+              '.deployment[$env][$type].spack[$v]' \
+              ${{ env.CONFIG_SETTINGS_PATH }}
             )
 
             # DEBUG
