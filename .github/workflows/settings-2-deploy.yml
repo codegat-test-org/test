@@ -40,9 +40,11 @@ jobs:
             '.deployment[$env][$type].spack' \
             ${{ env.CONFIG_SETTINGS_PATH }}
           )
-          versions=$(jq --null-input --compact-output --raw-output \
-            --argjson vs "$updates" \
-            '$vs | keys | @sh'
+          versions=$(jq --compact-output --raw-output \
+            --arg env "${{ inputs.deployment-environment }}" \
+            --arg type "${{ inputs.spack-type }}" \
+            '.deployment[$env][$type].spack | keys | @sh' \
+            ${{ env.CONFIG_SETTINGS_PATH }}
           )
 
           echo "$updates"
