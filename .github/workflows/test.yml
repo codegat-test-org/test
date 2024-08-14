@@ -1,24 +1,20 @@
 on:
   workflow_dispatch:
     inputs:
-      location:
-        type: string
-        required: false
-        default: './cd/config/settings.json'
+      global:
+        type: boolean
+        required: true
 jobs:
-  validating:
+  commit:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout build-cd Config
-      uses: actions/checkout@v4
-      with:
-        ref: main
-        path: cd
+      - uses: actions/checkout@v4
 
-    - name: Validate build-cd config/settings.json
-      id: validate
-      uses: codegat-test-org/test/.github/actions/settings@main
-      with:
-        error-level: error
+      - uses: access-nri/actions/.github/actions/setup-git-credentials@setup-git-credentials-action
+        with:
+          user-name: Tommy Gatti
+          user-email: ${{ secrets.GIT_USER_EMAIL }}
+          gpg-signing-key: ${{ secrets.SIGNING_KEY }}
 
-    - run: echo "${{ steps.validate.outputs.failures }}"
+      - run: |
+          git config --list
