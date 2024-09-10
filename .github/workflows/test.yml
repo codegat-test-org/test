@@ -1,14 +1,17 @@
 on:
-  push:
-    branches:
-      - important
-    paths:
-      - wow.file
-
+  workflow_dispatch:
+    inputs:
+      acl:
+        type: string
+        required: true
+        default: >-
+          u::rwx,
+          d:u::rwx,
+          o::---,
+          d:o::---
+        description: acls
 jobs:
-  commit:
+  a:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - run: echo "Woah"
+      - run: echo "${{ inputs.acl }}"
