@@ -18,6 +18,11 @@ jobs:
 
       - run: |
           for path in ${{ inputs.paths }}; do
+            echo "$path"
+          done
+
+      - run: |
+          for path in ${{ inputs.paths }}; do
             rsync --verbose --recursive \
               ${{ env.EXPERIMENTS_LOCATION }}/$path \
               ./wowee
