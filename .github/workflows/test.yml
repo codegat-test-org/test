@@ -16,8 +16,11 @@ jobs:
     steps:
       - run: echo "${{ inputs.paths }}"
 
-      - run: |
-          for path in ${{ inputs.paths }}; do
+      - env:
+          PATHS: |
+            ${{ inputs.paths }}
+        run: |
+          for path in ${{ env.PATHS }}; do
             echo "$path"
           done
 
