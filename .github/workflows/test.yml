@@ -1,17 +1,27 @@
 on:
   workflow_dispatch:
     inputs:
-      acl:
+      paths:
         type: string
-        required: true
-        default: >-
-          u::rwx,
-          d:u::rwx,
-          o::---,
-          d:o::---
-        description: acls
+        required: false
+        default: |
+          checksum
+          some/other/dir
+        description: paths
 jobs:
-  a:
+  rsyncing:
     runs-on: ubuntu-latest
+    env:
+      EXPERIMENTS_LOCATION: /opt
     steps:
-      - run: echo "${{ inputs.acl }}"
+      - run: echo "${{ inputs.paths }}"
+
+      - run: |
+          for path in ${{ inputs.paths }}; do
+            rsync --verbose --recursive \
+              ${{ env.EXPERIMENTS_LOCATION }}/$path \
+              ./wowee
+          done
+
+      - run: |
+          tree .
