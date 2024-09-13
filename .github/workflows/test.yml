@@ -17,8 +17,7 @@ jobs:
       - run: echo "${{ inputs.paths }}"
 
       - env:
-          PATHS: |
-            ${{ inputs.paths }}
+          PATHS: ${{ inputs.paths }}
         run: |
           for path in ${{ env.PATHS }}; do
             echo "$path"
