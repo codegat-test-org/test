@@ -33,5 +33,3 @@ jobs:
             group_regex_groups+=${BASH_REMATCH[1]}
           fi
           echo group_regex_groups
-
-      -
