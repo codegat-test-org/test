@@ -20,6 +20,8 @@ jobs:
           if [[ "${{ inputs.acl }}" =~ $user_regex ]]; then
             user_regex_groups+=${BASH_REMATCH[0]}
             user_regex_groups+=${BASH_REMATCH[1]}
+          else
+            echo "No match"
           fi
           echo ${user_regex_groups[*]}
 
@@ -31,5 +33,7 @@ jobs:
           if [[ "${{ inputs.acl }}" =~ $group_regex ]]; then
             group_regex_groups+=${BASH_REMATCH[0]}
             group_regex_groups+=${BASH_REMATCH[1]}
+          else
+            echo "No match"
           fi
           echo ${group_regex_groups[*]}
