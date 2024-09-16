@@ -1,34 +1,37 @@
+name: Test Workflow
 on:
   workflow_dispatch:
     inputs:
-      paths:
+      acl:
         type: string
-        required: false
-        default: |
-          checksum
-          some/other/dir
-        description: paths
+        required: true
+        default: u:someone:rwx,g:some_group:rwx,d:u:someone:rwx,d:g:some_group:rwx
 jobs:
-  rsyncing:
+  groups:
     runs-on: ubuntu-latest
-    env:
-      EXPERIMENTS_LOCATION: /opt
     steps:
-      - run: echo "${{ inputs.paths }}"
+      - uses: actions/checkout@v4
 
-      - env:
-          PATHS: ${{ inputs.paths }}
+      - id: user
         run: |
-          for path in ${{ env.PATHS }}; do
-            echo "$path"
-          done
+          user_regex="(?:d:)?u:([A-Za-z_]+):[rwx-]{3}"
+          user_regex_groups=()
 
-      - run: |
-          for path in ${{ inputs.paths }}; do
-            rsync --verbose --recursive \
-              ${{ env.EXPERIMENTS_LOCATION }}/$path \
-              ./wowee
-          done
+          if [[ "${{ inputs.acl }}" =~ $user_regex ]]; then
+            user_regex_groups+=${BASH_REMATCH[0]}
+            user_regex_groups+=${BASH_REMATCH[1]}
+          fi
+          echo user_regex_groups
 
-      - run: |
-          tree .
+      - id: group
+        run: |
+          group_regex="(?:d:)?g:([A-Za-z_]+):[rwx-]{3}"
+          group_regex_groups=()
+
+          if [[ "${{ inputs.acl }}" =~ $group_regex ]]; then
+            group_regex_groups+=${BASH_REMATCH[0]}
+            group_regex_groups+=${BASH_REMATCH[1]}
+          fi
+          echo group_regex_groups
+
+      -

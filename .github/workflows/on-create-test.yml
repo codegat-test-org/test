@@ -1,9 +1,0 @@
-name: On Create Test
-on:
-  create:
-jobs:
-  on-create:
-    if: github.event_name == 'push' || (github.event_name == 'create' && startsWith(github.ref_name, 'release-')) && github.repository != 'access-nri/model-configs-template'
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Wow, we ran when ${{ github.event_name }} on ${{ github.ref_name }}!"

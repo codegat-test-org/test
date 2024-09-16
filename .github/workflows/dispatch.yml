@@ -1,8 +1,0 @@
-on:
-  workflow_dispatch:
-jobs:
-  envs:
-    runs-on: ubuntu-latest
-    environment: Another Test
-    steps:
-      - run: echo "Hello world"
