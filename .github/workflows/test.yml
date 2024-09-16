@@ -14,10 +14,11 @@ jobs:
 
       - id: user
         run: |
+          acl="${{ inputs.acl }}"
           user_regex="(?:d:)?u:([A-Za-z_]+):[rwx-]{3}"
           user_regex_groups=()
 
-          if [[ "${{ inputs.acl }}" =~ $user_regex ]]; then
+          if [[ $acl =~ $user_regex ]]; then
             user_regex_groups+=${BASH_REMATCH[0]}
             user_regex_groups+=${BASH_REMATCH[1]}
           else
@@ -27,10 +28,11 @@ jobs:
 
       - id: group
         run: |
+          acl="${{ inputs.acl }}"
           group_regex="(?:d:)?g:([A-Za-z_]+):[rwx-]{3}"
           group_regex_groups=()
 
-          if [[ "${{ inputs.acl }}" =~ $group_regex ]]; then
+          if [[ $acl =~ $group_regex ]]; then
             group_regex_groups+=${BASH_REMATCH[0]}
             group_regex_groups+=${BASH_REMATCH[1]}
           else
