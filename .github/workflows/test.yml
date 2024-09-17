@@ -21,6 +21,8 @@ jobs:
             ${{ secrets.HOST_DATA }}
           private-key: ${{ secrets.KEY }}
 
+      - run: mkdir ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}
+
       - name: rsync
         if: inputs.additional-artifact-content-paths != ''
         continue-on-error: true
