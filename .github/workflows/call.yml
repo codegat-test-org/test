@@ -1,0 +1,13 @@
+name: Call rsync workflow
+on:
+  workflow_dispatch:
+jobs:
+  call-rsync:
+    uses: codegat-test-org/test/.github/workflows/test.yml@main
+    with:
+      additional-artifact-content-paths: |
+        tests/omp/*
+        some-file.txt
+        a2draft
+        something/that/isnt/there
+    secrets: inherit

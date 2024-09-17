@@ -1,41 +1,28 @@
 name: Test Workflow
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      acl:
+      additional-artifact-content-paths:
         type: string
-        required: true
-        default: u:someone:rwx,g:some_group:rwx,d:u:someone:rwx,d:g:some_group:rwx
+        required: false
 jobs:
-  groups:
+  rsync:
+    name: Rsync
     runs-on: ubuntu-latest
+    env:
+      TEST_OUTPUT_LOCAL_LOCATION: /opt/test-output
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup SSH
+        id: ssh
+        uses: access-nri/actions/.github/actions/setup-ssh@main
+        with:
+          hosts: |
+            ${{ secrets.HOST }}
+            ${{ secrets.HOST_DATA }}
+          private-key: ${{ secrets.KEY }}
 
-      - id: user
+      - name: rsync
         run: |
-          acl="${{ inputs.acl }}"
-          user_regex="(?:d:)?u:([A-Za-z_]+):[rwx-]{3}"
-          user_regex_groups=()
-
-          if [[ $acl =~ $user_regex ]]; then
-            user_regex_groups+=${BASH_REMATCH[0]}
-            user_regex_groups+=${BASH_REMATCH[1]}
-          else
-            echo "No match"
-          fi
-          echo ${user_regex_groups[*]}
-
-      - id: group
-        run: |
-          acl="${{ inputs.acl }}"
-          group_regex="(?:d:)?g:([A-Za-z_]+):[rwx-]{3}"
-          group_regex_groups=()
-
-          if [[ $acl =~ $group_regex ]]; then
-            group_regex_groups+=${BASH_REMATCH[0]}
-            group_regex_groups+=${BASH_REMATCH[1]}
-          else
-            echo "No match"
-          fi
-          echo ${group_regex_groups[*]}
+          for path in ${{ inputs.additional-artifact-content-paths }}; do
+            echo "Going to rsync ${{ vars.ROOT_DIR }}/$path to ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}"
+          done
