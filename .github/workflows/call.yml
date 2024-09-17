@@ -2,10 +2,26 @@ name: Call rsync workflow
 on:
   workflow_dispatch:
 jobs:
-  call-rsync:
+  call-no-ending-newline:
     uses: codegat-test-org/test/.github/workflows/test.yml@main
     with:
       additional-artifact-content-paths: |-
+        tests/omp/*
+        some-file.txt
+        a2draft
+        something/that/isnt/there
+    secrets: inherit
+
+  call-single-line:
+    uses: codegat-test-org/test/.github/workflows/test.yml@main
+    with:
+      additional-artifact-content-paths: tests/omp/*
+    secrets: inherit
+
+  call-ending-newline:
+    uses: codegat-test-org/test/.github/workflows/test.yml@main
+    with:
+      additional-artifact-content-paths: |
         tests/omp/*
         some-file.txt
         a2draft

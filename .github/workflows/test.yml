@@ -24,5 +24,7 @@ jobs:
       - name: rsync
         run: |
           while IFS= read -r content_path; do
-            echo "Going to rsync ${{ vars.ROOT_DIR }}/$content_path to ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}"
+            if [[ -n "$content_path" ]]; then
+              echo "Going to rsync ${{ vars.ROOT_DIR }}/$content_path to ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}"
+            fi
           done <<< "${{ inputs.additional-artifact-content-paths }}"
