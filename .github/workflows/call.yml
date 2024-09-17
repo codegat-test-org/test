@@ -6,10 +6,9 @@ jobs:
     uses: codegat-test-org/test/.github/workflows/test.yml@main
     with:
       additional-artifact-content-paths: |-
-        tests/omp/*
+        tests/omp
         some-file.txt
         a2draft
-        something/that/isnt/there
     secrets: inherit
 
   call-single-line:
@@ -22,9 +21,8 @@ jobs:
     uses: codegat-test-org/test/.github/workflows/test.yml@main
     with:
       additional-artifact-content-paths: |
-        tests/omp/*
+        tests/omp
         some-file.txt
-        something/that/isnt/there
         a2draft
     secrets: inherit
 
