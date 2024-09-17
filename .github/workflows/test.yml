@@ -23,6 +23,7 @@ jobs:
 
       - name: rsync
         if: inputs.additional-artifact-content-paths != ''
+        continue-on-error: true
         run: |
           while IFS= read -r content_path; do
             if [[ -n "$content_path" ]]; then
