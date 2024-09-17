@@ -24,6 +24,10 @@ jobs:
       additional-artifact-content-paths: |
         tests/omp/*
         some-file.txt
-        a2draft
         something/that/isnt/there
+        a2draft
+    secrets: inherit
+
+  call-nothing:
+    uses: codegat-test-org/test/.github/workflows/test.yml@main
     secrets: inherit
