@@ -1,39 +1,70 @@
-name: Test Workflow
+name: Schema
+# Validate schemas modified in an pull request or push against their given meta-schema (such as draft-07, etc.)
 on:
-  workflow_call:
-    inputs:
-      additional-artifact-content-paths:
-        type: string
-        required: false
+  pull_request:
+    branches:
+      - main
+    paths:
+      - au.org.access-nri/**.json
 jobs:
-  rsync:
-    name: Rsync
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
-    env:
-      TEST_OUTPUT_LOCAL_LOCATION: /opt/test-output
+    outputs:
+      matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }}
     steps:
-      - name: Setup SSH
-        id: ssh
-        uses: access-nri/actions/.github/actions/setup-ssh@main
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Get all modified schema
+      uses: tj-actions/changed-files@48d8f15b2aaa3d255ca5af3eba4870f807ce6b3c  # v45.0.3
+      id: changed
+      with:
+        matrix: true
+        files: |
+          **.json
+
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    needs:
+      - setup
+    strategy:
+      matrix:
+        schema: ${{ fromJson(needs.setup.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
         with:
-          hosts: |
-            ${{ secrets.HOST }}
-            ${{ secrets.HOST_DATA }}
-          private-key: ${{ secrets.KEY }}
+          fetch-depth: 0
 
-      - run: mkdir ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}
-
-      - name: rsync
-        if: inputs.additional-artifact-content-paths != ''
-        continue-on-error: true
+      - name: Get metaschema from schema
+        id: metaschema
+        # Given the $schema property in the schema, output the equivalent
+        # property that is understandable to GrantBirki/json-yaml-validate's json_schema_version
         run: |
-          while IFS= read -r content_path; do
-            if [[ -n "$content_path" ]]; then
-              echo "Going to rsync ${{ vars.ROOT_DIR }}/$content_path to ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}"
-              rsync --recursive --verbose -e 'ssh -i ${{ steps.ssh.outputs.private-key-path }}' \
-                "${{ secrets.USER}}@${{ secrets.HOST_DATA }}:${{ vars.ROOT_DIR }}/$content_path" \
-                ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}
-            fi
-          done <<< "${{ inputs.additional-artifact-content-paths }}"
+          schema_url=$(jq '.["$schema"]' ${{ matrix.schema }})
 
-      - run: tree ${{ env.TEST_OUTPUT_LOCAL_LOCATION }}
+          if [ -z "$schema_url" ]; then
+            echo '::error::No $schema property present in schema. Please add one to the schema.'
+            exit 1
+          elif [[ "$schema_url" =~ "draft-07" ]]; then
+            echo "version=draft-07" >> $GITHUB_OUTPUT
+          elif [[ "$schema_url" =~ "draft/2020-12" ]]; then
+            echo "version=draft-2020-12" >> $GITHUB_OUTPUT
+          elif [[ "$schema_url" =~ "draft/2019-09" ]]; then
+            echo "version=draft-2019-09" >> GITHUB_OUTPUT
+          else
+            echo "::error::Schema URL '$schema_url' is not handled by this workflow. Please let @access-nri/model-release know."
+            exit 1
+          fi
+
+      - uses: GrantBirki/json-yaml-validate@d7814b94473939c1daaca2c96131b891d4703a3c # v2.7.1
+        with:
+          mode: fail
+          files: |
+            ${{ matrix.schema }}
+          json_schema_version: ${{ steps.metaschema.outputs.version }}
+          yaml_as_json: true
+          ajv_strict_mode: false
+          use_gitignore: false
