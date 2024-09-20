@@ -38,16 +38,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get metaschema from schema
+      - name: Download metaschema from schema
         id: metaschema
         # Given the $schema property in the schema, output the equivalent
         # property that is understandable to GrantBirki/json-yaml-validate's json_schema_version
+        # and download the schema
         run: |
           schema_url=$(jq '.["$schema"]' ${{ matrix.schema }})
 
           if [ -z "$schema_url" ]; then
             echo '::error::No $schema property present in schema. Please add one to the schema.'
             exit 1
+          fi
+
+          schema_filename="schema.json"
+          curl -o $schema_filename $schema_url
+          echo "filename=$schema_filename" >> $GITHUB_OUTPUT
+
           elif [[ "$schema_url" =~ "draft-07" ]]; then
             echo "version=draft-07" >> $GITHUB_OUTPUT
           elif [[ "$schema_url" =~ "draft/2020-12" ]]; then
@@ -64,6 +71,7 @@ jobs:
           mode: fail
           files: |
             ${{ matrix.schema }}
+          json_schema: ${{ steps.metaschema.outputs.filename }}
           json_schema_version: ${{ steps.metaschema.outputs.version }}
           yaml_as_json: true
           ajv_strict_mode: false
