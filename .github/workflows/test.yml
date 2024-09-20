@@ -72,7 +72,6 @@ jobs:
           files: |
             ${{ matrix.schema }}
           json_schema: ${{ steps.metaschema.outputs.filename }}
-          json_schema_version: ${{ steps.metaschema.outputs.version }}
           yaml_as_json: true
           ajv_strict_mode: false
           use_gitignore: false
