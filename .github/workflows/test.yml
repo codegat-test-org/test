@@ -55,7 +55,7 @@ jobs:
           curl -o $schema_filename $schema_url
           echo "filename=$schema_filename" >> $GITHUB_OUTPUT
 
-          elif [[ "$schema_url" =~ "draft-07" ]]; then
+          if [[ "$schema_url" =~ "draft-07" ]]; then
             echo "version=draft-07" >> $GITHUB_OUTPUT
           elif [[ "$schema_url" =~ "draft/2020-12" ]]; then
             echo "version=draft-2020-12" >> $GITHUB_OUTPUT
