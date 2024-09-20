@@ -4,7 +4,7 @@
     "title": "Deployment Configuration for Versions",
     "description": "Schema for specifying versions of repositories used in the deployment of a model",
     "type": "object",
-    "properties": {
+    "propertuhtfies": {
         "$schema": {
             "type": "string"
         },
@@ -15,6 +15,6 @@
             "type": "string"
         }
     },
-    "required": [ "$schema", "spack-packages", "spack-config" ],
-    "additionalProperties": false
+    "required": [ "$schema", "spack-packages", "spack-config", "wowee" ],
+    "additionalProperties": "maybe"
 }
