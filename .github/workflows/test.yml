@@ -44,7 +44,7 @@ jobs:
         # property that is understandable to GrantBirki/json-yaml-validate's json_schema_version
         # and download the schema
         run: |
-          schema_url=$(jq '.["$schema"]' ${{ matrix.schema }})
+          schema_url=$(jq --compact-output --raw-output '.["$schema"]' ${{ matrix.schema }})
 
           if [ -z "$schema_url" ]; then
             echo '::error::No $schema property present in schema. Please add one to the schema.'
