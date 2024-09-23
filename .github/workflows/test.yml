@@ -1,6 +1,7 @@
 name: Schema
 # Validate schemas modified in an pull request or push against their given meta-schema (such as draft-07, etc.)
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -11,8 +12,10 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }}
+      matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }
     steps:
+    - run: sleep 100
+
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
