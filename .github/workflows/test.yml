@@ -12,7 +12,7 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }
+      matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }}
     steps:
     - run: sleep 100
 
