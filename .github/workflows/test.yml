@@ -14,8 +14,6 @@ jobs:
     outputs:
       matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }}
     steps:
-    - run: sleep 100
-
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
@@ -76,5 +74,4 @@ jobs:
             ${{ matrix.schema }}
           json_schema: ${{ steps.metaschema.outputs.filename }}
           yaml_as_json: true
-          ajv_strict_mode: false
           use_gitignore: false
