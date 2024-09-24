@@ -1,77 +1,75 @@
-name: Schema
+name: Multiline
 # Validate schemas modified in an pull request or push against their given meta-schema (such as draft-07, etc.)
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - au.org.access-nri/**.json
+    inputs:
+      env:
+        type: string
+        default: Gadi
+      type:
+        type: string
+        default: Release
 jobs:
-  setup:
-    name: Setup
+  multiline:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }}
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Get all modified schema
-      uses: tj-actions/changed-files@48d8f15b2aaa3d255ca5af3eba4870f807ce6b3c  # v45.0.3
-      id: changed
-      with:
-        matrix: true
-        files: |
-          **.json
-
-  validate:
-    name: Validate
-    runs-on: ubuntu-latest
-    needs:
-      - setup
-    strategy:
-      matrix:
-        schema: ${{ fromJson(needs.setup.outputs.matrix) }}
+    env:
+      CONFIG_SETTINGS_PATH: config/settings.json
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Download metaschema from schema
-        id: metaschema
-        # Given the $schema property in the schema, output the equivalent
-        # property that is understandable to GrantBirki/json-yaml-validate's json_schema_version
-        # and download the schema
+      - name: Setup spack updates
+        id: spack
+        # TODO: Since we can't format any of this later json as an input for this job (see the earlier workflow) we need to do it here
+        # Create a newline-separated list of strings of the form "MAJOR_VERSION COMMIT_HASH" so we
+        # update the remotes MAJOR_VERSION/spack to COMMIT_HASH. Ex: "0.20 y7834gtbf3jf3434rr34r34ru"
         run: |
-          schema_url=$(jq --compact-output --raw-output '.["$schema"]' ${{ matrix.schema }})
+          updates=$(jq --compact-output --raw-output \
+            --arg env "${{ inputs.env }}" \
+            --arg type "${{ inputs.type }}" \
+            '.deployment[$env][$type] | to_entries[] | "\(.key) \(.value.spack)"' \
+            ${{ env.CONFIG_SETTINGS_PATH }}
+          )
 
-          if [ -z "$schema_url" ]; then
-            echo '::error::No $schema property present in schema. Please add one to the schema.'
-            exit 1
-          fi
+          echo "$updates"
+          echo "updates<<EOF" >> $GITHUB_OUTPUT
+          echo "$updates" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-          schema_filename="schema.json"
-          curl -o $schema_filename $schema_url
-          echo "filename=$schema_filename" >> $GITHUB_OUTPUT
+      - name: Update spack
+        run: |
+          while read -ra update; do
+            version=${update[0]}
+            new_commit=${update[1]}
+            echo "$version and then $new_commit"
+          done <<< "${{ steps.spack.outputs.updates }}"
 
-          if [[ "$schema_url" =~ "draft-07" ]]; then
-            echo "version=draft-07" >> $GITHUB_OUTPUT
-          elif [[ "$schema_url" =~ "draft/2020-12" ]]; then
-            echo "version=draft-2020-12" >> $GITHUB_OUTPUT
-          elif [[ "$schema_url" =~ "draft/2019-09" ]]; then
-            echo "version=draft-2019-09" >> GITHUB_OUTPUT
-          else
-            echo "::error::Schema URL '$schema_url' is not handled by this workflow. Please let @access-nri/model-release know."
-            exit 1
-          fi
+  nonmultiline:
+    runs-on: ubuntu-latest
+    env:
+      CONFIG_SETTINGS_PATH: config/settings.json
+    steps:
+      - uses: actions/checkout@v4
 
-      - uses: GrantBirki/json-yaml-validate@d7814b94473939c1daaca2c96131b891d4703a3c # v2.7.1
-        with:
-          mode: fail
-          files: |
-            ${{ matrix.schema }}
-          json_schema: ${{ steps.metaschema.outputs.filename }}
-          yaml_as_json: true
-          use_gitignore: false
+      - name: Setup spack updates
+        id: spack
+        # TODO: Since we can't format any of this later json as an input for this job (see the earlier workflow) we need to do it here
+        # Create a newline-separated list of strings of the form "MAJOR_VERSION COMMIT_HASH" so we
+        # update the remotes MAJOR_VERSION/spack to COMMIT_HASH. Ex: "0.20 y7834gtbf3jf3434rr34r34ru"
+        run: |
+          updates=$(jq --compact-output --raw-output \
+            --arg env "${{ inputs.env }}" \
+            --arg type "${{ inputs.type }}" \
+            '.deployment[$env][$type] | to_entries[] | "\(.key) \(.value.spack)"' \
+            ${{ env.CONFIG_SETTINGS_PATH }}
+          )
+
+          echo "$updates"
+          echo "updates=$updates" >> $GITHUB_OUTPUT
+
+      - name: Update spack
+        run: |
+          while read -ra update; do
+            version=${update[0]}
+            new_commit=${update[1]}
+            echo "$version and then $new_commit"
+          done <<< "${{ steps.spack.outputs.updates }}"
