@@ -23,22 +23,44 @@ on:
 jobs:
   multiline:
     runs-on: ubuntu-latest
+    if: inputs.target-acl-spec != ''
     container: rockylinux/rockylinux:8.10
     env:
       TEST_DIR: /opt/test
     steps:
+      - name: Format ACL
+        id: fmt
+        run: echo "acl=$(echo '${{ inputs.target-acl-spec }}' | tr -d ' ')" >> $GITHUB_OUTPUT
+
       - name: Create Users
         run: |
-          echo "${{ inputs.target-acl-spec }}"
+          set +e
+          echo "${{ steps.fmt.outputs.acl }}"
+
+          acl="${{ steps.fmt.outputs.acl }}"
+          for entry in $acl; do
+            if [[ $entry =~ ^u(ser)?:([^:]+): ]]; then
+              user="${BASH_REMATCH[2]}"
+              echo "Adding user $user"
+              useradd $user
+            fi
+          done
 
       - name: Create Groups
         run: |
-          echo "${{ inputs.target-acl-spec }}"
+          set +e
+          echo "${{ steps.fmt.outputs.acl }}"
+
+          acl="${{ steps.fmt.outputs.acl }}"
+          for entry in $acl; do
+            if [[ $entry =~ ^g(roup)?:([^:]+): ]]; then
+              user="${BASH_REMATCH[2]}"
+              echo "Adding group $group"
+              groupadd $group
+            fi
+          done
 
       - name: Verify Valid ACL Spec
-        if: inputs.target-acl-spec != ''
-        env:
-          TEST_DIR: /opt/test
         run: |
           mkdir ${{ env.TEST_DIR }}
           setfacl --test --recursive --modify "${{ inputs.target-acl-spec }}" ${{ env.TEST_DIR }}
