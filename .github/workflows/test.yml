@@ -3,73 +3,42 @@ name: Multiline
 on:
   workflow_dispatch:
     inputs:
-      env:
+      target-acl-spec:
         type: string
-        default: Gadi
-      type:
-        type: string
-        default: Release
+        required: true
+        # Default to no write for everyone except tm70_ci
+        # TODO: This default will probably not work for other `remote-environment`s
+        default: >-
+          u::rwx,
+          u:tm70_ci:rwx,
+          g::r-x,
+          m::rwx,
+          o::---,
+          d:u::rwx,
+          d:u:tm70_ci:rwx,
+          d:g::r-x,
+          d:m::rwx,
+          d:o::---
+        description: ACL spec to be passed to `setfacl -m` for the given target
 jobs:
   multiline:
     runs-on: ubuntu-latest
+    container: rockylinux/rockylinux:8.10
     env:
-      CONFIG_SETTINGS_PATH: config/settings.json
+      TEST_DIR: /opt/test
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup spack updates
-        id: spack
-        # TODO: Since we can't format any of this later json as an input for this job (see the earlier workflow) we need to do it here
-        # Create a newline-separated list of strings of the form "MAJOR_VERSION COMMIT_HASH" so we
-        # update the remotes MAJOR_VERSION/spack to COMMIT_HASH. Ex: "0.20 y7834gtbf3jf3434rr34r34ru"
+      - name: Create Users
         run: |
-          updates=$(jq --compact-output --raw-output \
-            --arg env "${{ inputs.env }}" \
-            --arg type "${{ inputs.type }}" \
-            '.deployment[$env][$type] | to_entries[] | "\(.key) \(.value.spack)"' \
-            ${{ env.CONFIG_SETTINGS_PATH }}
-          )
+          echo "${{ inputs.target-acl-spec }}"
 
-          echo "$updates"
-          echo "updates<<EOF" >> $GITHUB_OUTPUT
-          echo "$updates" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Update spack
+      - name: Create Groups
         run: |
-          while read -ra update; do
-            version=${update[0]}
-            new_commit=${update[1]}
-            echo "$version and then $new_commit"
-          done <<< "${{ steps.spack.outputs.updates }}"
+          echo "${{ inputs.target-acl-spec }}"
 
-  nonmultiline:
-    runs-on: ubuntu-latest
-    env:
-      CONFIG_SETTINGS_PATH: config/settings.json
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup spack updates
-        id: spack
-        # TODO: Since we can't format any of this later json as an input for this job (see the earlier workflow) we need to do it here
-        # Create a newline-separated list of strings of the form "MAJOR_VERSION COMMIT_HASH" so we
-        # update the remotes MAJOR_VERSION/spack to COMMIT_HASH. Ex: "0.20 y7834gtbf3jf3434rr34r34ru"
+      - name: Verify Valid ACL Spec
+        if: inputs.target-acl-spec != ''
+        env:
+          TEST_DIR: /opt/test
         run: |
-          updates=$(jq --compact-output --raw-output \
-            --arg env "${{ inputs.env }}" \
-            --arg type "${{ inputs.type }}" \
-            '.deployment[$env][$type] | to_entries[] | "\(.key) \(.value.spack)"' \
-            ${{ env.CONFIG_SETTINGS_PATH }}
-          )
-
-          echo "$updates"
-          echo "updates=$updates" >> $GITHUB_OUTPUT
-
-      - name: Update spack
-        run: |
-          while read -ra update; do
-            version=${update[0]}
-            new_commit=${update[1]}
-            echo "$version and then $new_commit"
-          done <<< "${{ steps.spack.outputs.updates }}"
+          mkdir ${{ env.TEST_DIR }}
+          setfacl --test --recursive --modify "${{ inputs.target-acl-spec }}" ${{ env.TEST_DIR }}
