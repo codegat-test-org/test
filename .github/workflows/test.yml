@@ -63,4 +63,6 @@ jobs:
       - name: Verify Valid ACL Spec
         run: |
           mkdir ${{ env.TEST_DIR }}
+          cut -d: -f1 /etc/passwd
+          groups
           setfacl --test --recursive --modify "${{ inputs.target-acl-spec }}" ${{ env.TEST_DIR }}
