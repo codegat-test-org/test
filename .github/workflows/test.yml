@@ -68,4 +68,4 @@ jobs:
           mkdir ${{ env.TEST_DIR }}
           cut -d: -f1 /etc/passwd
           groups
-          setfacl --test --recursive --modify "${{ inputs.target-acl-spec }}" ${{ env.TEST_DIR }}
+          setfacl --test --recursive --modify "${{ steps.fmt.outputs.acl }}" ${{ env.TEST_DIR }}
