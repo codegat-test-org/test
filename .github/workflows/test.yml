@@ -38,6 +38,7 @@ jobs:
           echo "${{ steps.fmt.outputs.acl }}"
 
           acl="${{ steps.fmt.outputs.acl }}"
+          IFS=,
           for entry in $acl; do
             echo "E: $entry"
             if [[ $entry =~ ^u(ser)?:([^:]+): ]]; then
@@ -53,6 +54,7 @@ jobs:
           echo "${{ steps.fmt.outputs.acl }}"
 
           acl="${{ steps.fmt.outputs.acl }}"
+          IFS=,
           for entry in $acl; do
             if [[ $entry =~ ^g(roup)?:([^:]+): ]]; then
               user="${BASH_REMATCH[2]}"
