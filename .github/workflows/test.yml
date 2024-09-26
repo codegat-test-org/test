@@ -1,20 +1,147 @@
-name: Validate with new check-jsonschema
-# Validate schemas modified in an pull request or push against their given meta-schema (such as draft-07, etc.)
+name: Config Inputs Remote Copy
+run-name: "${{ inputs.remote-environment }} Config Input Copy to ${{ inputs.target }}"
 on:
   workflow_dispatch:
+    inputs:
+      remote-environment:
+        type: choice
+        required: true
+        description: The Github Environment for the given remote
+        options:
+          - Gadi
+      source:
+        type: string
+        required: true
+        description: Remote absolute path to configuration input file/folder
+      target:
+        type: string
+        required: true
+        description: Remote absolute path for the copied configuration input file/folder
+      overwrite-target:
+        type: boolean
+        required: true
+        description: Overwrite the remote target if it already exists
+      target-acl-spec:
+        type: string
+        required: true
+        # Default to no write for everyone except tm70_ci
+        # TODO: This default will probably not work for other `remote-environment`s
+        default: >-
+          u::rwx,
+          u:tm70_ci:rwx,
+          g::r-x,
+          m::rwx,
+          o::---,
+          d:u::rwx,
+          d:u:tm70_ci:rwx,
+          d:g::r-x,
+          d:m::rwx,
+          d:o::---
+        description: ACL spec to be passed to `setfacl -m` for the given target
 jobs:
-  validate:
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Log inputs
+        run: |
+          echo ""::notice::Copy on ${{ inputs.remote-environment }} from '${{ inputs.source }}' to '${{ inputs.target }}' with ACLs '${{ inputs.target-acl-spec }}'"
+          echo "::${{ inputs.overwrite-target && 'warning' || 'notice' }}::This operation ${{ inputs.overwrite-target && 'WILL' || 'will not' }} overwrite ${{ inputs.target }}"
 
-      - uses: actions/setup-python@v5
+      - name: Verify Remote Target
+        run: |
+          if [[ "${{ startsWith(inputs.target, vars.CONFIGS_INPUT_DIR) }}" == "true" ]]; then
+            echo "::error::Remote target '${{ inputs.target }}' doesn't look like a configurations input directory."
+            exit 1
+          fi
+
+  test-acl:
+    name: Test ACL
+    runs-on: ubuntu-latest
+    if: inputs.target-acl-spec != ''
+    container: rockylinux/rockylinux:8.10
+    env:
+      TEST_DIR: /opt/test
+    steps:
+      - name: Format ACL
+        id: fmt
+        # Remove spaces from ACL string as we have later logic that relies on
+        # the IFS=,
+        run: |
+          acl=$(echo '${{ inputs.target-acl-spec }}' | tr -d ' ')
+          echo "Formatted ACL: $acl
+          echo "acl=$acl" >> $GITHUB_OUTPUT
+
+      - name: Create Users in ACL String
+        # We don't error out here as it could have been because we are adding the same user twice
+        run: |
+          set +e
+          acl="${{ steps.fmt.outputs.acl }}"
+          IFS=,
+          for entry in $acl; do
+            echo "Testing ACL for u(ser): $entry"
+            if [[ $entry =~ ^u(ser)?:([^:]+): ]]; then
+              user="${BASH_REMATCH[2]}"
+              echo "Adding user $user"
+              useradd $user
+            fi
+          done
+
+      - name: Create Groups in ACL String
+        # We don't error out here as it could have been because we are adding the same group twice
+        run: |
+          set +e
+          acl="${{ steps.fmt.outputs.acl }}"
+          IFS=,
+          for entry in $acl; do
+            if [[ $entry =~ ^g(roup)?:([^:]+): ]]; then
+              echo "Testing ACL for g(roup): $entry"
+              group="${BASH_REMATCH[2]}"
+              echo "Adding group $group"
+              groupadd $group
+            fi
+          done
+
+      - name: Verify Valid ACL Spec
+        # Now that we have created the users and groups from the ACL string, check if it is valid!
+        run: |
+          mkdir ${{ env.TEST_DIR }}
+          echo "---- Users ----"
+          cut -d: -f1 /etc/passwd
+
+          echo "---- Groups ----"
+          groups
+
+          setfacl --test --recursive --modify "${{ steps.fmt.outputs.acl }}" ${{ env.TEST_DIR }}
+
+  remote:
+    name: Remote
+    runs-on: ubuntu-latest
+    needs:
+      - setup
+      - test-acl
+    environment: ${{ inputs.remote-environment }}
+    steps:
+      - name: Setup SSH
+        id: ssh
+        uses: access-nri/actions/.github/actions/setup-ssh@main
         with:
-          python-version: '3.10'
-          cache: pip
+          private-key: ${{ secrets.SSH_KEY }}
+          hosts: |
+            ${{ secrets.SSH_HOST }}
+            ${{ secrets.SSH_HOST_DATA }}
 
-      - run: |
-          pip install check-jsonschema==0.29.2
-          check-jsonschema --help
-          check-jsonschema --schemafile config/versions.schema.json config/versions.json
+      - name: Rsync Source to Target
+        run: |
+          rsync --recursive --verbose -e 'ssh -i ${{ steps.ssh.outputs.private-key-path }}' \
+            ${{ ! inputs.overwrite-target && '--ignore-existing' || '--update' }} \
+            '${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ inputs.source }}' \
+            '${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ inputs.target }}'
 
+      - name: Set ACLs on Target
+        if: inputs.target-acl-spec != ''
+        run: |
+          ssh ${{ secrets.USER}}@${{ secrets.HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
+          setfacl --recursive --modify "${{ inputs.target-acl-spec }}" ${{ inputs.target }}
+          getfacl -t ${{ inputs.target }}
+          EOT
