@@ -45,7 +45,7 @@ jobs:
     steps:
       - name: Log inputs
         run: |
-          echo ""::notice::Copy on ${{ inputs.remote-environment }} from '${{ inputs.source }}' to '${{ inputs.target }}' with ACLs '${{ inputs.target-acl-spec }}'"
+          echo "::notice::Copy on ${{ inputs.remote-environment }} from '${{ inputs.source }}' to '${{ inputs.target }}' with ACLs '${{ inputs.target-acl-spec }}'"
           echo "::${{ inputs.overwrite-target && 'warning' || 'notice' }}::This operation ${{ inputs.overwrite-target && 'WILL' || 'will not' }} overwrite ${{ inputs.target }}"
 
       - name: Verify Remote Target
@@ -69,7 +69,7 @@ jobs:
         # the IFS=,
         run: |
           acl=$(echo '${{ inputs.target-acl-spec }}' | tr -d ' ')
-          echo "Formatted ACL: $acl
+          echo "Formatted ACL: $acl"
           echo "acl=$acl" >> $GITHUB_OUTPUT
 
       - name: Create Users in ACL String
