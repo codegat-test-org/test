@@ -42,6 +42,9 @@ jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
+    outputs:
+      # The `inputs.target-acl-spec` with spaces removed
+      formatted-acl: ${{ steps.fmt.outputs.acl }}
     steps:
       - name: Log inputs
         run: |
@@ -55,14 +58,6 @@ jobs:
             exit 1
           fi
 
-  test-acl:
-    name: Test ACL
-    runs-on: ubuntu-latest
-    if: inputs.target-acl-spec != ''
-    container: rockylinux/rockylinux:8.10
-    env:
-      TEST_DIR: /opt/test
-    steps:
       - name: Format ACL
         id: fmt
         # Remove spaces from ACL string as we have later logic that relies on
@@ -72,11 +67,21 @@ jobs:
           echo "Formatted ACL: $acl"
           echo "acl=$acl" >> $GITHUB_OUTPUT
 
+  test-acl:
+    name: Test ACL
+    runs-on: ubuntu-latest
+    if: inputs.target-acl-spec != ''
+    needs:
+      - setup
+    container: rockylinux/rockylinux:8.10
+    env:
+      TEST_DIR: /opt/test
+    steps:
       - name: Create Users in ACL String
         # We don't error out here as it could have been because we are adding the same user twice
         run: |
           set +e
-          acl="${{ steps.fmt.outputs.acl }}"
+          acl="${{ needs.setup.outputs.formatted-acl }}"
           IFS=,
           for entry in $acl; do
             echo "Testing ACL for u(ser): $entry"
@@ -143,6 +148,6 @@ jobs:
         if: inputs.target-acl-spec != ''
         run: |
           ssh ${{ secrets.USER}}@${{ secrets.HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
-          setfacl --recursive --modify "${{ inputs.target-acl-spec }}" ${{ inputs.target }}
+          setfacl --recursive --modify "${{ needs.setup.outputs.formatted-acl }}" ${{ inputs.target }}
           getfacl -t ${{ inputs.target }}
           EOT
