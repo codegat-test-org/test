@@ -16,5 +16,5 @@ jobs:
       - run: |
           pip install check-jsonschema==0.29.2
           check-jsonschema --help
-          check-jsonschema config/versions.schema.json -i config/versions.json
+          check-jsonschema --schemafile config/versions.schema.json config/versions.json
 
