@@ -96,7 +96,7 @@ jobs:
         # We don't error out here as it could have been because we are adding the same group twice
         run: |
           set +e
-          acl="${{ steps.fmt.outputs.acl }}"
+          acl="${{ needs.setup.outputs.formatted-acl }}"
           IFS=,
           for entry in $acl; do
             if [[ $entry =~ ^g(roup)?:([^:]+): ]]; then
@@ -117,7 +117,7 @@ jobs:
           echo "---- Groups ----"
           groups
 
-          setfacl --test --recursive --modify "${{ steps.fmt.outputs.acl }}" ${{ env.TEST_DIR }}
+          setfacl --test --recursive --modify "${{ needs.setup.outputs.formatted-acl }}" ${{ env.TEST_DIR }}
 
   remote:
     name: Remote
