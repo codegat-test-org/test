@@ -1,71 +1,20 @@
-name: Multiline
+name: Validate with new check-jsonschema
 # Validate schemas modified in an pull request or push against their given meta-schema (such as draft-07, etc.)
 on:
   workflow_dispatch:
-    inputs:
-      target-acl-spec:
-        type: string
-        required: true
-        # Default to no write for everyone except tm70_ci
-        # TODO: This default will probably not work for other `remote-environment`s
-        default: >-
-          u::rwx,
-          u:tm70_ci:rwx,
-          g::r-x,
-          m::rwx,
-          o::---,
-          d:u::rwx,
-          d:u:tm70_ci:rwx,
-          d:g::r-x,
-          d:m::rwx,
-          d:o::---
-        description: ACL spec to be passed to `setfacl -m` for the given target
 jobs:
-  multiline:
+  validate:
     runs-on: ubuntu-latest
-    if: inputs.target-acl-spec != ''
-    container: rockylinux/rockylinux:8.10
-    env:
-      TEST_DIR: /opt/test
     steps:
-      - name: Format ACL
-        id: fmt
-        run: echo "acl=$(echo '${{ inputs.target-acl-spec }}' | tr -d ' ')" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v4
 
-      - name: Create Users
-        run: |
-          set +e
-          echo "${{ steps.fmt.outputs.acl }}"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: pip
 
-          acl="${{ steps.fmt.outputs.acl }}"
-          IFS=,
-          for entry in $acl; do
-            echo "E: $entry"
-            if [[ $entry =~ ^u(ser)?:([^:]+): ]]; then
-              user="${BASH_REMATCH[2]}"
-              echo "Adding user $user"
-              useradd $user
-            fi
-          done
+      - run: |
+          pip install check-jsonschema==0.29.2
+          check-jsonschema --help
+          check-jsonschema config/versions.schema.json -i config/versions.json
 
-      - name: Create Groups
-        run: |
-          set +e
-          echo "${{ steps.fmt.outputs.acl }}"
-
-          acl="${{ steps.fmt.outputs.acl }}"
-          IFS=,
-          for entry in $acl; do
-            if [[ $entry =~ ^g(roup)?:([^:]+): ]]; then
-              user="${BASH_REMATCH[2]}"
-              echo "Adding group $group"
-              groupadd $group
-            fi
-          done
-
-      - name: Verify Valid ACL Spec
-        run: |
-          mkdir ${{ env.TEST_DIR }}
-          cut -d: -f1 /etc/passwd
-          groups
-          setfacl --test --recursive --modify "${{ steps.fmt.outputs.acl }}" ${{ env.TEST_DIR }}
