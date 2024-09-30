@@ -165,7 +165,7 @@ jobs:
           rsync --recursive --out-format="%n" \
               ${{ ! inputs.overwrite-target && '--ignore-existing' || '--update' }} \
               ${{ inputs.source }} ${{ inputs.target }} \
-            | tr '\n' ' ' \  # convert to space-separated for output
+            | tr '\n' ' ' \
             > ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
 
