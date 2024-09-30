@@ -189,16 +189,13 @@ jobs:
               ${{ inputs.source }} ${{ inputs.target }} \
             | tr '\n' ' ' \
             > ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
-          echo "File is in ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}"
-          cat ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
-          echo "About to copy via scp normally"
-          scp ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }}
+
+          rsync -e 'ssh -i ${{ steps.ssh.outputs.private-key-path }}' \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} \
+            ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }}
           cat ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }}
-          echo "Now to do the regular thing..."
-          scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout
-          echo "And send to a variable..."
-          paths=$(scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout)
+          paths=$(cat ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }})
           echo "paths are $paths
           echo "paths=$paths" >> $GITHUB_OUTPUT
 
