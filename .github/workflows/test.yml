@@ -190,10 +190,11 @@ jobs:
           module load ${{ vars.YAMF_MODULE_NAME }}
 
           manifest_paths=()
-          while read -r path:
-            cd $(dirname $path)
+          while read -r path; do
+            cd $(dirname $path) || exit
             manifest_dir=$(basename $path)
-            yamf add -n manifest.yaml --force $manifest_dir
+            echo "DEBUG: would have added a manifest as $manifest_dir/manifest.yaml"
+            # yamf add -n manifest.yaml --force $manifest_dir
             manifest_paths+=("$manifest_dir/manifest.yaml")
           done <<< "${{ steps.copy.outputs.paths }}"
           echo "${manifest_paths[@]}" > ${{ env.REMOTE_MANIFEST_FILE_LIST_PATH }}
@@ -219,11 +220,11 @@ jobs:
             ${{ secrets.SSH_HOST }}
             ${{ secrets.SSH_HOST_DATA }}
 
-      - name: Send Target to Tape
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
-          now=$(date +%Y_%m_%d_%H_%M)
-          mdss -P ${{ vars.PROJECT_CODE }} mkdir -p ${{ vars.TAPE_ROOT_DIR }}/$now
-          mdss -P ${{ vars.PROJECT_CODE }} put -r ${{ needs.copy-to-remote.outputs.files }} ${{ vars.TAPE_ROOT_DIR }}/$now
-          mdss -P ${{ vars.PROJECT_CODE }} put -r ${{ needs.copy-to-remote.outputs.manifests }} ${{ vars.TAPE_ROOT_DIR }}/$now
-          EOT
+      # - name: Send Target to Tape
+      #   run: |
+      #     ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
+      #     now=$(date +%Y_%m_%d_%H_%M)
+      #     mdss -P ${{ vars.PROJECT_CODE }} mkdir -p ${{ vars.TAPE_ROOT_DIR }}/$now
+      #     mdss -P ${{ vars.PROJECT_CODE }} put -r ${{ needs.copy-to-remote.outputs.files }} ${{ vars.TAPE_ROOT_DIR }}/$now
+      #     mdss -P ${{ vars.PROJECT_CODE }} put -r ${{ needs.copy-to-remote.outputs.manifests }} ${{ vars.TAPE_ROOT_DIR }}/$now
+      #     EOT
