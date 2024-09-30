@@ -178,6 +178,7 @@ jobs:
         id: copy
         env:
           REMOTE_RSYNC_FILE_LIST_PATH: ${{ vars.REMOTE_TMP_DIR }}/remote-copy-files-${{ github.run_id }}.log
+          LOCAL_RSYNC_FILE_LIST_PATH: ./files-copied.log
         # In this step, we rsync the files from the source to the target,
         # capturing the list of files copied as output of the step, since
         # it's used in the manifest step.
@@ -191,7 +192,12 @@ jobs:
           echo "File is in ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}"
           cat ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
-          echo "About to copy via scp..."
+          echo "About to copy via scp normally"
+          scp ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }}
+          cat ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }}
+          echo "Now to do the regular thing..."
+          scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout
+          echo "And send to a variable..."
           paths=$(scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout)
           echo "paths are $paths
           echo "paths=$paths" >> $GITHUB_OUTPUT
