@@ -187,8 +187,8 @@ jobs:
               ${{ ! inputs.overwrite-target && '--ignore-existing' || '--update' }} \
               ${{ inputs.source }} ${{ inputs.target }} \
             | tr '\n' ' ' \
-            | tee ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
-          echo "File is:"
+            > ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
+          echo "File is in ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}"
           cat ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
 
