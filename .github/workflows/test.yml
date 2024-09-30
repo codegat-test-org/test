@@ -58,6 +58,27 @@ jobs:
           echo "::notice::Copy on ${{ inputs.remote-environment }} from '${{ inputs.source }}' to '${{ inputs.target }}' with ACLs '${{ inputs.target-acl-spec }}'"
           echo "::${{ inputs.overwrite-target && 'warning' || 'notice' }}::This operation ${{ inputs.overwrite-target && 'WILL' || 'will not' }} overwrite ${{ inputs.target }}"
 
+      - name: Verify inputs
+        run: |
+          errors=false
+
+          if [ -z "${{ inputs.source }}"]; then
+            echo "::error::No 'source' input given, can't copy anything."
+            errors=true
+          fi
+          if [ -z "${{ inputs.target }}"]; then
+            echo "::error::No 'target' input given, can't copy to anywhere."
+            errors=true
+          fi
+          if [ -z "${{ inputs.target-acl-spec }}" ]; then
+            echo "::notice::No 'ACL' input given, not setting the ACLs explicitly."
+          fi
+
+          if [[ "$errors" == "true" ]]; then
+            echo "::error::Errors above, exiting..."
+            exit 1
+          fi
+
       - name: Format ACL
         id: fmt
         # Remove spaces from ACL string as we have later logic that relies on
@@ -169,7 +190,7 @@ jobs:
             > ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
 
-          echo "paths=$(scp -q ${{ secrets.USER }}:${{ secrets.HOST }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout) >> $GITHUB_OUTPUT
+          echo "paths=$(scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout) >> $GITHUB_OUTPUT
 
       - name: Set ACLs on Target
         if: inputs.target-acl-spec != ''
