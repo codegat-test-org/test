@@ -190,7 +190,7 @@ jobs:
             > ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
 
-          echo "paths=$(scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout) >> $GITHUB_OUTPUT
+          echo "paths=$(scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout) >> $GITHUB_OUTPUT
 
       - name: Set ACLs on Target
         if: inputs.target-acl-spec != ''
