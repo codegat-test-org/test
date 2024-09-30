@@ -188,7 +188,8 @@ jobs:
               ${{ inputs.source }} ${{ inputs.target }} \
             | tr '\n' ' ' \
             | tee ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
-
+          echo "File is:"
+          cat ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
 
           paths=$(scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_RSYNC_FILE_LIST_PATH }} /dev/stdout)
