@@ -196,7 +196,7 @@ jobs:
             ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }}
           cat ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }}
           paths=$(cat ${{ env.LOCAL_RSYNC_FILE_LIST_PATH }})
-          echo "paths are $paths
+          echo "paths are $paths"
           echo "paths=$paths" >> $GITHUB_OUTPUT
 
       - name: Set ACLs on Target
