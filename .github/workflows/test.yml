@@ -187,6 +187,7 @@ jobs:
           rsync --recursive --out-format="%n" \
               ${{ ! inputs.overwrite-target && '--ignore-existing' || '--update' }} \
               ${{ inputs.source }} ${{ inputs.target }} \
+            | grep --invert-match '/$' \
             | tr '\n' ' ' \
             > ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
@@ -218,13 +219,14 @@ jobs:
           module load ${{ vars.YAMF_MODULE_NAME }}
 
           manifest_paths=()
-          while read -r path; do
+          for path in ${{ steps.copy.outputs.paths }}; do
+            echo "Path is $path"
             cd $(dirname $path) || exit
             manifest_dir=$(basename $path)
             echo "DEBUG: would have added a manifest as $manifest_dir/manifest.yaml"
             # yamf add -n manifest.yaml --force $manifest_dir
             manifest_paths+=("$manifest_dir/manifest.yaml")
-          done <<< "${{ steps.copy.outputs.paths }}"
+          done
           echo "${manifest_paths[@]}" > ${{ env.REMOTE_MANIFEST_FILE_LIST_PATH }}
           EOT
 
