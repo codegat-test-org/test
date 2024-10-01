@@ -268,14 +268,20 @@ jobs:
           for file in ${{ needs.copy-to-remote.outputs.files }}; do
             file_relative_to_target=${file#${{ inputs.target }}/}
             echo "Moving '$file' to ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target"
-            mdss -P ${{ vars.PROJECT_CODE }} mkdir -p ${{ vars.TAPE_ROOT_DIR }}/$now/$(dirname $file_relative_to_target)
+            dirs_after_target=$(dirname $file_relative_to_target)
+            if [[ "$dirs_after_target" != "." ]]; then
+              mdss -P ${{ vars.PROJECT_CODE }} mkdir -p ${{ vars.TAPE_ROOT_DIR }}/$now/$(dirname $file_relative_to_target)
+            fi
             mdss -P ${{ vars.PROJECT_CODE }} put -r $file ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target
           done
 
           for file in ${{ needs.copy-to-remote.outputs.manifests }}; do
             file_relative_to_target=${file#${{ inputs.target }}/}
             echo "Moving '$file' to ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target"
-            mdss -P ${{ vars.PROJECT_CODE }} mkdir -p ${{ vars.TAPE_ROOT_DIR }}/$now/$(dirname $file_relative_to_target)
+            dirs_after_target=$(dirname $file_relative_to_target)
+            if [[ "$dirs_after_target" != "." ]]; then
+              mdss -P ${{ vars.PROJECT_CODE }} mkdir -p ${{ vars.TAPE_ROOT_DIR }}/$now/$(dirname $file_relative_to_target)
+            fi
             mdss -P ${{ vars.PROJECT_CODE }} put -r $file ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target
           done
 
