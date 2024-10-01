@@ -223,7 +223,8 @@ jobs:
           for path in ${{ steps.copy.outputs.paths }}; do
             echo "Path is $path"
             cd $(dirname $path) || exit
-            manifest_dir=$(dirname $path)
+            manifest_file=$(basename $path)
+            echo "Manifest File is $manifest_file"
             yamf add -n manifest.yaml --force $manifest_dir
             manifest_paths+=("$manifest_dir/manifest.yaml")
           done
