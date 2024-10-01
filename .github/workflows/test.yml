@@ -213,6 +213,7 @@ jobs:
         env:
           REMOTE_MANIFEST_FILE_LIST_PATH: ${{ vars.REMOTE_TMP_DIR }}/remote-copy-manifests-${{ github.run_id }}.log
           LOCAL_MANIFEST_FILE_LIST_PATH: ./manifests-copied.log
+          MANIFEST_FILE_NAME: manifest.yaml
         # Generate manifests for files copied over in the earlier rsync job
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
@@ -222,11 +223,12 @@ jobs:
           manifest_paths=()
           for path in ${{ steps.copy.outputs.paths }}; do
             echo "Path is $path"
-            cd $(dirname $path) || exit
+            manifest_dir=$(dirname $path)
+            cd $manifest_dir || exit
             manifest_file=$(basename $path)
-            echo "Manifest File is $manifest_file"
-            yamf add -n manifest.yaml --force $manifest_dir
-            manifest_paths+=("$manifest_dir/manifest.yaml")
+            echo "Generating a manifest in $manifest_dir for $manifest_file"
+            yamf add -n ${{ env.MANIFEST_FILE_NAME }} --force $manifest_file
+            manifest_paths+=("$manifest_dir/${{ env.MANIFEST_FILE_NAME }}")
           done
           echo "${manifest_paths[@]}" > ${{ env.REMOTE_MANIFEST_FILE_LIST_PATH }}
           EOT
