@@ -184,10 +184,9 @@ jobs:
         # it's used in the manifest step.
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
-          rsync --recursive --out-format="%n" \
+          rsync --recursive --out-format="%f" \
               ${{ ! inputs.overwrite-target && '--ignore-existing' || '--update' }} \
               ${{ inputs.source }} ${{ inputs.target }} \
-            | grep --invert-match '/$' \
             | tr '\n' ' ' \
             > ${{ env.REMOTE_RSYNC_FILE_LIST_PATH }}
           EOT
