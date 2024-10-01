@@ -223,8 +223,7 @@ jobs:
           for path in ${{ steps.copy.outputs.paths }}; do
             echo "Path is $path"
             cd $(dirname $path) || exit
-            # FIXME: Might be dirname $path instead
-            manifest_dir=$(basename $path)
+            manifest_dir=$(dirname $path)
             echo "DEBUG: would have added a manifest as $manifest_dir/manifest.yaml"
             # yamf add -n manifest.yaml --force $manifest_dir
             manifest_paths+=("$manifest_dir/manifest.yaml")
@@ -246,7 +245,7 @@ jobs:
     needs:
       - copy-to-remote
     # TODO: Generalize the copy-to-tape job for future remote-environments
-    if: inputs.store-on-tape && inputs.remote-environment == 'Gadi'
+    if: inputs.store-on-tape && startsWith(inputs.remote-environment, 'Gadi')
     environment: ${{ inputs.remote-environment }}
     steps:
       - name: Setup SSH
