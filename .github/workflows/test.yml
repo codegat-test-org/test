@@ -263,7 +263,20 @@ jobs:
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
           now=$(date +%Y_%m_%d_%H_%M)
+
           mdss -P ${{ vars.PROJECT_CODE }} mkdir -p ${{ vars.TAPE_ROOT_DIR }}/$now
-          mdss -P ${{ vars.PROJECT_CODE }} put -r ${{ needs.copy-to-remote.outputs.files }} ${{ vars.TAPE_ROOT_DIR }}/$now
-          mdss -P ${{ vars.PROJECT_CODE }} put -r ${{ needs.copy-to-remote.outputs.manifests }} ${{ vars.TAPE_ROOT_DIR }}/$now
+          for file in ${{ needs.copy-to-remote.outputs.files }}; do
+            file_relative_to_target=${file#${{ inputs.target }}/}
+            echo "Moving '$file' to ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target"
+            mdss -P ${{ vars.PROJECT_CODE }} put -r $file ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target
+          done
+
+          for file in ${{ needs.copy-to-remote.outputs.manifests }}; do
+            file_relative_to_target=${file#${{ inputs.target }}/}
+            echo "Moving '$file' to ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target"
+            mdss -P ${{ vars.PROJECT_CODE }} put -r $file ${{ vars.TAPE_ROOT_DIR }}/$now/$file_relative_to_target
+          done
+
+          echo "Output:"
+          mdss -P ${{ vars.PROJECT_CODE }} ls -R ${{ vars.TAPE_ROOT_DIR }}/$now
           EOT
