@@ -184,7 +184,7 @@ jobs:
         # it's used in the manifest step.
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
-          rsync --recursive --out-format="%f" \
+          rsync --recursive --out-format="/%f" \
               ${{ ! inputs.overwrite-target && '--ignore-existing' || '--update' }} \
               ${{ inputs.source }} ${{ inputs.target }} \
             | grep --invert-match '/$' \
@@ -212,6 +212,7 @@ jobs:
         id: manifest
         env:
           REMOTE_MANIFEST_FILE_LIST_PATH: ${{ vars.REMOTE_TMP_DIR }}/remote-copy-manifests-${{ github.run_id }}.log
+          LOCAL_MANIFEST_FILE_LIST_PATH: ./manifests-copied.log
         # Generate manifests for files copied over in the earlier rsync job
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
@@ -230,7 +231,13 @@ jobs:
           echo "${manifest_paths[@]}" > ${{ env.REMOTE_MANIFEST_FILE_LIST_PATH }}
           EOT
 
-          echo "paths=$(scp -q ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_MANIFEST_FILE_LIST_PATH }} /dev/stdout)" >> $GITHUB_OUTPUT
+          rsync -e 'ssh -i ${{ steps.ssh.outputs.private-key-path }}' \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_DATA }}:${{ env.REMOTE_MANIFEST_FILE_LIST_PATH }} \
+            ${{ env.LOCAL_MANIFEST_FILE_LIST_PATH }}
+          cat ${{ env.LOCAL_MANIFEST_FILE_LIST_PATH }}
+          paths=$(cat ${{ env.LOCAL_MANIFEST_FILE_LIST_PATH }})
+          echo "paths are $paths"
+          echo "paths=$paths" >> $GITHUB_OUTPUT
 
   copy-to-tape:
     name: Copy To Tape
