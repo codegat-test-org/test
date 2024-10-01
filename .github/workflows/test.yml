@@ -184,7 +184,7 @@ jobs:
         # it's used in the manifest step.
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
-          rsync --recursive --out-format="/%f" \
+          rsync --recursive --out-format="${{ inputs.target }}/%n" \
               ${{ ! inputs.overwrite-target && '--ignore-existing' || '--update' }} \
               ${{ inputs.source }} ${{ inputs.target }} \
             | grep --invert-match '/$' \
@@ -223,6 +223,7 @@ jobs:
           for path in ${{ steps.copy.outputs.paths }}; do
             echo "Path is $path"
             cd $(dirname $path) || exit
+            # FIXME: Might be dirname $path instead
             manifest_dir=$(basename $path)
             echo "DEBUG: would have added a manifest as $manifest_dir/manifest.yaml"
             # yamf add -n manifest.yaml --force $manifest_dir
