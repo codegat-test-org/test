@@ -99,7 +99,7 @@ jobs:
           done
 
           if [[ "$type_in_comment_valid" == "false" ]]; then
-            echo "::error::The command '${{ github.event.issue.comment.body }}' doesn't have a valid TYPE. Was given '$type_in_command', but needed to be one of: ${{ env.USAGE_TYPES }}."
+            echo "::error::The command '${{ github.event.comment.body }}' doesn't have a valid TYPE. Was given '$type_in_command', but needed to be one of: ${{ env.USAGE_TYPES }}."
             exit 1
           fi
 
