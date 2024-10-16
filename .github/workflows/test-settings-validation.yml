@@ -1,16 +1,14 @@
 name: Test Settings Validation at PR Level
 on:
-  workflow_dispatch:
+  issue_comment:
+    types:
+      - created
+      - edited
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: access-nri/build-cd
-          ref: 123-spack-config-in-settings-file
-
-      - uses: access-nri/build-cd/.github/actions/validate-deployment-settings@123-spack-config-in-settings-file
-        with:
-          settings-path: ./config/settings.json
-          target: Gadi
+  wowee:
+    if: github.event. startsWith(github.event.comment.body, '!test')
+    uses: ./.github/workflows/call.yml
+    permissions:
+      pull-requests: write
+      contents: write
+    secrets: inherit
