@@ -333,6 +333,7 @@ jobs:
       - name: Update files
         # This will copy checksums from the artifact to the repo
         run: |
+          mkdir testing
           cp --recursive --verbose ${{ env.ARTIFACT_LOCAL_LOCATION }}/*/* testing
 
       # - name: Import Commit-Signing Key
