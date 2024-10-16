@@ -7,7 +7,7 @@ on:
 jobs:
   wowee:
     if: startsWith(github.event.comment.body, '!test')
-    uses: ./.github/workflows/call.yml
+    uses: codegat-test-org/test/.github/workflows/call.yml@main
     permissions:
       pull-requests: write
       contents: write
