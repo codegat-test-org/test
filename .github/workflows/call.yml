@@ -12,8 +12,40 @@ env:
   USAGE_TYPES: repro
   RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 jobs:
+  permission-check:
+    name: Permission Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine if commenter has permission to run the command
+        id: commenter
+        # TODO: The permissions-checking section seems ripe for turning into an action!
+        run: |
+          commenter_permissions=$(gh api \
+              repos/${{ github.repository }}/collaborators/${{ github.event.comment.user.login }}/permission \
+              --jq '.permission'
+          )
+          if [[ "$commenter_permission" == "admin" || "$commenter_permission" == "write" ]]; then
+            echo "Commenter has at least write permission"
+            echo "permission=true" >> $GITHUB_OUTPUT
+          else
+            echo "Commenter does not have at least write permission"
+            echo "permission=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: React to '!test'
+        uses: access-nri/actions/.github/actions/react-to-comment@main
+        with:
+          reaction: ${{ steps.commenter.outputs.permission == 'true' && 'rocket' || 'confused' }}
+          token: ${{ github.token }}
+
+      - name: Fail if no permissions
+        if: steps.commenter.outputs.permission == 'false'
+        run: exit 1
+
   ci-config:
     name: Read CI Testing Configuration
+    needs:
+      - permission-check
     runs-on: ubuntu-latest
     outputs:
       markers: ${{ steps.repro-config.outputs.markers }}
@@ -52,6 +84,8 @@ jobs:
 
   prepare-command:
     name: Prepare Command
+    needs:
+      - permission-check
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -65,8 +99,8 @@ jobs:
       compared-config-hash: ${{ steps.compared.outputs.hash }}
       # the git ref (branch or tag) of the configuration being compared against
       compared-config-ref: ${{ steps.compared.outputs.ref }}
-      # whether the commenter can commit to the repo (either 'true', 'false' or '' (when no 'commit' option given))
-      has-commit-permission: ${{ steps.commit.outputs.permission }}
+      # whether the commenter can commit to the repo
+      commit-requested: ${{ steps.commit.outputs.requested }}
       # TODO: Make this an input to the command when we start deploying to multiple targets
       environment-name: Gadi
     permissions:
@@ -137,19 +171,10 @@ jobs:
         run: |
           if [[ "${{ contains(github.event.comment.body, 'commit') }}" == "false" ]]; then
             echo "'commit' option not given"
-            exit 0
-          fi
-
-          commenter_permissions=$(gh api /
-              repos/${{ github.repository }}/collaborators/${{ github.event.comment.user.login }}/permission
-              --jq '.permission'
-          )
-          if [[ "$commenter_permission" == "admin" || "$commenter_permission" == "write" ]]; then
-            echo "'commit' option given and commenter has at least write permission"
-            echo "permission=true" >> $GITHUB_OUTPUT
+            echo "requested=false" >> $GITHUB_OUTPUT
           else
-            echo "'commit' option given but commenter does not have at least write permission"
-            echo "permission=false" >> $GITHUB_OUTPUT
+            echo "'commit' option given"
+            echo "requested=true" >> $GITHUB_OUTPUT
           fi
 
   repro:
@@ -265,7 +290,7 @@ jobs:
 
   commit:
     name: Commit Result
-    if: needs.prepare-command.outputs.has-commit-permission == 'true'
+    if: needs.prepare-command.outputs.commit-requested == 'true'
     needs:
       - prepare-command
       - repro
@@ -320,6 +345,7 @@ jobs:
   failure-notifier:
     name: Notify PR of Workflow Failure
     needs:
+      - permission-check
       - check-repro
       - commit
     if: failure()
@@ -328,4 +354,6 @@ jobs:
       - uses: access-nri/actions/.github/actions/pr-comment@main
         with:
           comment: |
-            :x: `!test` Command Failed. See ${{ env.RUN_URL }} :x:
+            :x: `!test` Command Failed. :x:
+            ${{ needs.permission-check.result == 'failure' && 'You do not have at least write permissions on this repository.' || '' }}
+            See ${{ env.RUN_URL }}
