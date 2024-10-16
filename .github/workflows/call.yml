@@ -117,8 +117,9 @@ jobs:
         # Set up a default ref
         run: |
           ref=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
+          echo "$ref"
           hash=$(git merge-base --fork-point "$ref")
-
+          echo "$hash"
           echo "Using $hash (on $ref)"
 
           echo "hash=$hash" >> $GITHUB_OUTPUT
