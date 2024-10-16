@@ -116,8 +116,7 @@ jobs:
         id: compared
         # Set up a default ref
         run: |
-          gh pr checkout ${{ github.event.issue.number }}
-          ref=$(gh pr view --json baseRefName --jq '.baseRefName')
+          ref=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           hash=$(git merge-base --fork-point "$ref")
 
           echo "Using $hash (on $ref)"
