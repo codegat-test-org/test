@@ -28,7 +28,7 @@ jobs:
               repos/${{ github.repository }}/collaborators/${{ github.event.comment.user.login }}/permission \
               --jq '.permission'
           )
-          if [[ "$commenter_permission" == "admin" || "$commenter_permission" == "write" ]]; then
+          if [[ "$commenter_permissions" == "admin" || "$commenter_permissions" == "write" ]]; then
             echo "Commenter has at least write permission"
             echo "permission=true" >> $GITHUB_OUTPUT
           else
