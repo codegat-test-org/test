@@ -11,4 +11,5 @@ jobs:
     permissions:
       pull-requests: write
       contents: write
+      checks: write
     secrets: inherit
