@@ -205,6 +205,8 @@ jobs:
           name: ${{ needs.repro.outputs.artifact-name }}
           path: ${{ env.TESTING_LOCAL_LOCATION }}
 
+      - run: tree ${{ env.TESTING_LOCAL_LOCATION }}
+
       - name: Parse Test Report
         id: tests
         uses: EnricoMi/publish-unit-test-result-action/composite@e780361cd1fc1b1a170624547b3ffda64787d365  #v2.12.0
