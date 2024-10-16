@@ -308,6 +308,9 @@ jobs:
 
   failure-notifier:
     name: Notify PR of Workflow Failure
+    needs:
+      - check-repro
+      - commit
     if: failure()
     runs-on: ubuntu-latest
     steps:
