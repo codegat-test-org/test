@@ -29,7 +29,7 @@ jobs:
         uses: access-nri/schema/.github/actions/validate-with-schema@main
         with:
           # As with a lot of the `vars`/`secrets` in this repo, this will be defined in the caller repo
-          schema-version: 3-0-0
+          schema-version: 2-0-0
           meta-schema-version: draft-2020-12
           schema-location: au.org.access-nri/model/configuration/ci
           data-location: config/ci.json
