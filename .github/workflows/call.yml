@@ -85,7 +85,7 @@ jobs:
 
       - name: Get log
         run: |
-          git log --decorate=oneline --graph
+          git log --graph --decorate --format=format:'%C(bold magenta)%h%C(reset) - %C(bold blue)(%an, %ar) %C(white)%<|(-1,trunc)%s%C(auto)%+d' --all
 
       - name: Get test type
         id: test
