@@ -6,7 +6,7 @@ on:
       - edited
 jobs:
   wowee:
-    if: github.event. startsWith(github.event.comment.body, '!test')
+    if: startsWith(github.event.comment.body, '!test')
     uses: ./.github/workflows/call.yml
     permissions:
       pull-requests: write
