@@ -15,6 +15,10 @@ jobs:
   permission-check:
     name: Permission Check
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    permissions:
+      pull-requests: write
     steps:
       - name: Determine if commenter has permission to run the command
         id: commenter
