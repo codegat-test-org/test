@@ -118,8 +118,8 @@ jobs:
         run: |
           ref=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "$ref"
-          git status
-          echo "This should work?"
+          git log --graph --decorate --format=format:'%C(bold magenta)%h%C(reset) - %C(bold blue)(%an, %ar) %C(white)%<|(-1,trunc)%s%C(auto)%+d' --all
+
           git merge-base --fork-point main ${{ steps.pr.outputs.hash }}
           echo "But this will fail"
           hash=$(git merge-base --fork-point "$ref")
