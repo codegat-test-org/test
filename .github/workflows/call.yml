@@ -86,7 +86,7 @@ jobs:
       - name: Get test type
         id: test
         run: |
-          command="${{ github.event.issue.comment.body }}"
+          command="${{ github.event.comment.body }}"
           read -ra command_tokens <<< "$command"
           type_in_comment="${command_tokens[1]}"
           type_in_comment_valid=false
