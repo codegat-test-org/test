@@ -118,6 +118,7 @@ jobs:
         run: |
           ref=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "$ref"
+          git --version
           git merge-base --fork-point "$ref"
           echo "Did the merge base"
           hash=$(git merge-base --fork-point "$ref")
