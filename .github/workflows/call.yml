@@ -118,8 +118,6 @@ jobs:
         run: |
           ref=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "$ref"
-          git status
-          git merge-base --fork-point "$ref"
           hash=$(git merge-base --fork-point "$ref")
           echo "$hash"
           echo "Using $hash (on $ref)"
@@ -167,6 +165,10 @@ jobs:
           echo "Running Repro Stuff"
 
       - uses: actions/checkout@v4
+
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr checkout ${{ github.event.issue.number }}
 
       - id: upload
         uses: actions/upload-artifact@v4
