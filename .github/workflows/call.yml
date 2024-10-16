@@ -120,7 +120,7 @@ jobs:
           echo "$ref"
           git status
           echo "This should work?"
-          git merge-base --fork-point main
+          git merge-base --fork-point main ${{ steps.pr.outputs.hash }}
           echo "But this will fail"
           hash=$(git merge-base --fork-point "$ref")
           echo "$hash"
