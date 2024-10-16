@@ -122,7 +122,7 @@ jobs:
         run: |
           ref=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "$ref"
-          hash=$(git merge-base --fork-point "origin/$ref" "origin/${{ steps.pr.outputs.ref }}")
+          hash=$(git merge-base --fork-point "origin/${{ steps.pr.outputs.ref }}" "origin/$ref")
           echo "$hash"
           echo "Using $hash (on $ref)"
 
