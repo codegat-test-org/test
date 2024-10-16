@@ -201,6 +201,7 @@ jobs:
     env:
       TESTING_LOCAL_LOCATION: /opt/testing
     permissions:
+      pull-requests: write
       checks: write
     steps:
       - name: Download Newly Created Checksum
