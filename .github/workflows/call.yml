@@ -118,7 +118,6 @@ jobs:
         run: |
           ref=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "$ref"
-          git fetch --unshallow
           git merge-base --fork-point origin/main ${{ steps.pr.outputs.hash }}
           echo "But this will fail"
           hash=$(git merge-base --fork-point "$ref")
