@@ -92,7 +92,7 @@ jobs:
           type_in_comment_valid=false
 
           for type in ${{ env.USAGE_TYPES }}; do
-            if [[ "$type_in_command" == "$type" ]]; then
+            if [[ "$type_in_comment" == "$type" ]]; then
               type_in_comment_valid=true
               break
             fi
@@ -103,7 +103,7 @@ jobs:
             exit 1
           fi
 
-          echo "type=$type_in_command" >> $GITHUB_OUTPUT
+          echo "type=$type_in_comment" >> $GITHUB_OUTPUT
 
       - name: Get config ref from PR comment
         id: pr
