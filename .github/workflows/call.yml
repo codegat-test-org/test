@@ -377,6 +377,7 @@ jobs:
     name: Notify PR of Workflow Failure
     needs:
       - permission-check
+      - prepare-command
       - check-repro
       - commit
     if: failure()
@@ -384,7 +385,9 @@ jobs:
     steps:
       - uses: access-nri/actions/.github/actions/pr-comment@main
         with:
-          comment: |
+          comment: >-
             :x: `!test` Command Failed. :x:
+            ${{ needs.prepare-command.result == 'failure' && 'The command given could not be parsed correctly.' || '' }}
             ${{ needs.permission-check.result == 'failure' && 'You do not have at least write permissions on this repository.' || '' }}
+            ${{ needs.commit.result == 'failure' && 'There was a problem committing the result of the reproducibility run.' || '' }}
             See ${{ env.RUN_URL }}
