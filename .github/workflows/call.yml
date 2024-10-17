@@ -145,7 +145,7 @@ jobs:
           done
 
           if [[ "$type_in_comment_valid" == "false" ]]; then
-            echo "::error::The command '${{ github.event.comment.body }}' doesn't have a valid TYPE. Was given '$type_in_command', but needed to be one of: ${{ env.USAGE_TYPES }}."
+            echo "::error::The command '${{ github.event.comment.body }}' doesn't have a valid TYPE. Was given '$type_in_comment', but needed to be one of: ${{ env.USAGE_TYPES }}."
             exit 1
           fi
 
@@ -177,16 +177,35 @@ jobs:
 
       - name: Determine whether to commit
         id: commit
-        # Determine whether the commenter can actually commit something to the repo if they write 'commit'
-        # by getting their repo permissions.
-        # TODO: The permissions-checking section seems ripe for turning into an action!
+        # Determine whether the commenter wants to commit something to the repository
         run: |
-          if [[ "${{ contains(github.event.comment.body, 'commit') }}" == "false" ]]; then
+          command="${{ github.event.comment.body }}"
+          read -ra command_tokens <<< "$command"
+          potential_commit_token="${command_tokens[2]}"
+
+          if [[ "$potential_commit_token" == "commit" ]]; then
+            echo "'commit' option given"
+            echo "requested=true" >> $GITHUB_OUTPUT
+          elif [ -z "$potential_commit_token" ]; then
             echo "'commit' option not given"
             echo "requested=false" >> $GITHUB_OUTPUT
           else
-            echo "'commit' option given"
-            echo "requested=true" >> $GITHUB_OUTPUT
+            echo "::error::Non-commit option '$potential_commit_token' given. Usage: ${{ env.USAGE }}"
+            exit 1
+          fi
+
+      - name: Erroneous tokens check
+        # If commit is given, any tokens after the 3rd are considered erroneous - otherwise it is after the 2nd
+        # TODO: This will need to be made more robust if there are other options added
+        run: |
+          command="${{ github.event.comment.body }}"
+          read -ra command_tokens <<< "$command"
+
+          max_tokens_allowed=$([[ "${{ steps.commit.outputs.requested }}" == "true" ]] && echo "3" || echo "2")
+
+          if [ "${#command_tokens[@]}" -gt "$max_tokens_allowed" ]; then
+            echo "::error::Erroneous tokens given. Usage: ${{ env.USAGE }}"
+            exit 1
           fi
 
   repro:
