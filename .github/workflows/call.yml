@@ -386,7 +386,7 @@ jobs:
       - uses: access-nri/actions/.github/actions/pr-comment@main
         with:
           comment: >-
-            :x: `!test` Command Failed. :x:
+            :x: `!test` Command Failedit. :x:
             ${{ needs.prepare-command.result == 'failure' && 'The command given could not be parsed correctly.' || '' }}
             ${{ needs.permission-check.result == 'failure' && 'You do not have at least write permissions on this repository.' || '' }}
             ${{ needs.commit.result == 'failure' && 'There was a problem committing the result of the reproducibility run.' || '' }}
