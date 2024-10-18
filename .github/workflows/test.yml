@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   pr-comment-test:
-    name: !test
+    name: '!test'
     runs-on: ubuntu-latest
     steps:
       - run: echo Hello
