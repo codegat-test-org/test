@@ -29,7 +29,8 @@ jobs:
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -A -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
           export GPG_TTY=$(tty)
-          gpg-connect-agent updatestartuptty /bye >/dev/null
+          gpg-connect-agent allow-loopback-pinentry /bye >/dev/null
+          gpg-conenct-agent reloadagent /bye >/dev/null
           cd test
           echo "Adding stuff" >> README.md
           git commit -am "Added stuff"
