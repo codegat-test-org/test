@@ -28,6 +28,7 @@ jobs:
       - name: With forwarding
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -A -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
+          export GPG_TTY=$(tty)
           cd test
           echo "Adding stuff" >> README.md
           git commit -am "Added stuff"
