@@ -22,7 +22,7 @@ jobs:
       - name: Validate ACCESS-NRI spack.yaml Restrictions
         uses: access-nri/schema/.github/actions/validate-with-schema@main
         with:
-          schema-version: ${{ vars.SPACK_YAML_SCHEMA_VERSION }}
+          schema-version: 3-0-0
           schema-location: au.org.access-nri/model/spack/environment/deployment
           data-location: ./model/spack.yaml
 
