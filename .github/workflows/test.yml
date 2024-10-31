@@ -2,37 +2,55 @@ name: Test sign forwarding
 on:
   workflow_dispatch:
 jobs:
-  test-forward-sign-key:
+  check-spack-yaml:
+    name: Check spack.yaml
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
-      - name: Setup SSH
-        id: ssh
-        uses: access-nri/actions/.github/actions/setup-ssh@main
+      - uses: actions/checkout@v4
         with:
-          private-key: ${{ secrets.SSH_KEY }}
-          hosts: |
-            ${{ secrets.SSH_HOST }}
+          repository: access-nri/access-esm1.5
+          fetch-depth: 0
+          path: model
 
-      - name: Import Commit-Signing Key
-        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4  # v6.1.0
+      - uses: actions/checkout@v4
         with:
-          gpg_private_key: ${{ secrets.GH_ACTIONS_BOT_GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GH_ACTIONS_BOT_GPG_PASSPHRASE }}
-          git_config_global: true
-          git_committer_name: ${{ secrets.GH_ACTIONS_BOT_GIT_USER_NAME }}
-          git_committer_email: ${{ secrets.GH_ACTIONS_BOT_GIT_USER_EMAIL }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_tag_gpgsign: true
+          repository: access-nri/build-cd
+          path: cd
 
-      - name: With forwarding
+      - name: Validate ACCESS-NRI spack.yaml Restrictions
+        uses: access-nri/schema/.github/actions/validate-with-schema@main
+        with:
+          schema-version: ${{ vars.SPACK_YAML_SCHEMA_VERSION }}
+          schema-location: au.org.access-nri/model/spack/environment/deployment
+          data-location: ./model/spack.yaml
+
+      - name: DBG - Check Model Version Modified
+        id: version-modified
+        working-directory: model
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -A -i ${{ steps.ssh.outputs.private-key-path }} /bin/bash <<'EOT'
-          export GPG_TTY=$(tty)
-          gpg-connect-agent allow-loopback-pinentry /bye >/dev/null
-          gpg-connect-agent reloadagent /bye >/dev/null
-          cd test
-          echo "Adding stuff" >> README.md
-          git commit -am "Added stuff"
-          git push
-          EOT
+          git status
+
+      - name: Projection Version Matches
+        # this step checks that the versions of the packages themselves match with the
+        #  names of the projections, if they're given.
+        # For example, access-om3@git.2023.12.12 matches with the
+        #  modulefile access-om3/2023.12.12 (specifically, the version strings match)
+        run: |
+          ./cd/scripts/ci/projection-check.bash "./model/spack.yaml" "access-esm1p5"
+
+
+      - name: DBG Generate Versions
+        id: version
+        # This step generates the release and prerelease version numbers.
+        # The release is a general version number from the spack.yaml, looking the
+        # same as a regular release build. Ex. 'access-om2@git.2024.01.1' -> '2024.01.1'
+        # The prerelease looks like: `pr<pull request number>-<number of commits on this branch>`.
+        # Ex. Pull Request #12 with 2 commits on branch -> `pr12-2`.
+        working-directory: model
+        run: |
+          release=$(yq '${{ env.SPACK_YAML_MODEL_YQ }} | split("@git.") | .[1]' spack.yaml)"
+          echo "$release"
+          echo "release=$release" >> $GITHUB_OUTPUT
+
