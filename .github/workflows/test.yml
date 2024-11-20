@@ -51,7 +51,7 @@ jobs:
         # Ex. Pull Request #12 with 2 commits on branch -> `pr12-2`.
         working-directory: model
         run: |
-          release=$(yq '${{ env.SPACK_YAML_MODEL_YQ }} | split("@git.") | .[1]' spack.yaml)"
+          release=$(yq '.spack.specs[0] | split("@git.") | .[1]' spack.yaml)"
           echo "$release"
           echo "release=$release" >> $GITHUB_OUTPUT
 
