@@ -1,57 +1,31 @@
-name: Test Scriptified workflow
+name: Test updating description
 on:
   workflow_dispatch:
 jobs:
-  check-spack-yaml:
-    name: Check spack.yaml
+  desc:
+    name: Update desc
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: access-nri/access-esm1.5
-          fetch-depth: 0
-          path: model
-
-      - uses: actions/checkout@v4
-        with:
-          repository: access-nri/build-cd
-          ref: 153-less-restrictive-projections-script
-          path: cd
-
-      - name: Validate ACCESS-NRI spack.yaml Restrictions
-        uses: access-nri/schema/.github/actions/validate-with-schema@main
-        with:
-          schema-version: 1-0-2
-          schema-location: au.org.access-nri/model/spack/environment/deployment
-          data-location: ./model/spack.yaml
-
-      - name: DBG - Check Model Version Modified
-        id: version-modified
-        working-directory: model
+      - name: PR Description Notifier
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BODY_FILE_LOCATION: ./body.txt
+          LATEST_PRERELEASE_SECTION_REGEX: "^:rocket: .* :rocket:$"
+          LATEST_PRERELEASE_SECTION: ":rocket: The latest prerelease (`x/y`) is found [here](http://example.org) :rocket:"
         run: |
-          git status
+          gh pr view 22 --repo ${{ github.repository }} --json body --jq .body > ${{ env.PR_BODY_FILE_LOCATION }}
 
-      - name: Projection Version Matches
-        # this step checks that the versions of the packages themselves match with the
-        #  names of the projections, if they're given.
-        # For example, access-om3@git.2023.12.12 matches with the
-        #  modulefile access-om3/2023.12.12 (specifically, the version strings match)
-        run: |
-          ./cd/scripts/ci/projection-check.bash "./model/spack.yaml" "access-esm1p5"
+          if grep -q '${{ env.LATEST_PRERELEASE_SECTION_REGEX }}' ${{ env.PR_BODY_FILE_LOCATION }}; then  # there is an existing prerelease section
+            # Replace the existing prerelease section
+            sed -i 's/${{ env.LATEST_PRERELEASE_SECTION_REGEX }}/${{ env.LATEST_PRERELEASE_SECTION }}/g' ${{ env.PR_BODY_FILE_LOCATION }}
+          else  # a new section is added
+            cat << EOL >> ${{ env.PR_BODY_FILE_LOCATION }}
 
+            -----------
+            ${{ env.LATEST_PRERELEASE_SECTION }}
+            EOL
+          fi
 
-      - name: DBG Generate Versions
-        id: version
-        # This step generates the release and prerelease version numbers.
-        # The release is a general version number from the spack.yaml, looking the
-        # same as a regular release build. Ex. 'access-om2@git.2024.01.1' -> '2024.01.1'
-        # The prerelease looks like: `pr<pull request number>-<number of commits on this branch>`.
-        # Ex. Pull Request #12 with 2 commits on branch -> `pr12-2`.
-        working-directory: model
-        run: |
-          release=$(yq '${{ env.SPACK_YAML_MODEL_YQ }} | split("@git.") | .[1]' spack.yaml)"
-          echo "$release"
-          echo "release=$release" >> $GITHUB_OUTPUT
-
+          gh pr edit 22 --repo ${{ github.repository }} --body-file ${{ env.PR_BODY_FILE_LOCATION }}
