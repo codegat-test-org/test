@@ -21,8 +21,8 @@ jobs:
             # Replace the existing prerelease section
             sed -i 's/${{ env.LATEST_PRERELEASE_SECTION_REGEX }}/${{ env.LATEST_PRERELEASE_SECTION }}/g' ${{ env.PR_BODY_FILE_LOCATION }}
           else  # a new section is added
-            echo -e "\n" >> ${{ env.PR_BODY_FILE_LOCATION }}
-            echo "---" >> ${{ env.PR_BODY_FILE_LOCATION }}
-            echo "${{ env.LATEST_PRERELEASE_SECTION }}" >> ${{ env.LATEST_PRERELEASE_SECTION }}"          fi
-
+            echo -e '\n' >> ${{ env.PR_BODY_FILE_LOCATION }}
+            echo '---' >> ${{ env.PR_BODY_FILE_LOCATION }}
+            echo '${{ env.LATEST_PRERELEASE_SECTION }}' >> ${{ env.PR_BODY_FILE_LOCATION }}
+          fi
           gh pr edit 22 --repo ${{ github.repository }} --body-file ${{ env.PR_BODY_FILE_LOCATION }}
