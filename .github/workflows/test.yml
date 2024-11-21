@@ -13,7 +13,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_BODY_FILE_LOCATION: ./body.txt
           LATEST_PRERELEASE_SECTION_REGEX: "^:rocket: .* :rocket:$"
-          LATEST_PRERELEASE_SECTION: ":rocket: The latest prerelease (`x/y`) is found [here](http://example.org) :rocket:"
+          LATEST_PRERELEASE_SECTION: ":rocket: The latester prerelease (`x/y`) is found [here](http://example.org) :rocket:"
         run: |
           gh pr view 22 --repo ${{ github.repository }} --json body --jq .body > ${{ env.PR_BODY_FILE_LOCATION }}
 
