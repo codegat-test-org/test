@@ -19,7 +19,7 @@ jobs:
 
           if grep -q '${{ env.LATEST_PRERELEASE_SECTION_REGEX }}' ${{ env.PR_BODY_FILE_LOCATION }}; then  # there is an existing prerelease section
             # Replace the existing prerelease section
-            sed -i 's/${{ env.LATEST_PRERELEASE_SECTION_REGEX }}/${{ env.LATEST_PRERELEASE_SECTION }}/g' ${{ env.PR_BODY_FILE_LOCATION }}
+            sed -i 's|${{ env.LATEST_PRERELEASE_SECTION_REGEX }}|${{ env.LATEST_PRERELEASE_SECTION }}|g' ${{ env.PR_BODY_FILE_LOCATION }}
           else  # a new section is added
             echo -e '\n' >> ${{ env.PR_BODY_FILE_LOCATION }}
             echo '---' >> ${{ env.PR_BODY_FILE_LOCATION }}
