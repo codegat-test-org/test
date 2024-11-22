@@ -1,27 +1,24 @@
-name: Test updating description
+name: Test updating commit status
 on:
   workflow_dispatch:
 jobs:
-  desc:
-    name: Update desc
+  test:
+    name: test
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
+      statuses: write
     steps:
-      - name: PR Description Notifier
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_BODY_PATH: ./body.txt
-          PR_BODY_PATH_UPDATED: ./updated.body.txt
-          PRERELEASE_SECTION_REGEX: "^:rocket: .* :rocket:$"
-          PRERELEASE_SECTION: ":rocket: The latest prerelease `x/y+1` is [here](http://example.org) :rocket:"
-        run: |
-          gh pr view 22 --repo ${{ github.repository }} --json body --jq .body > ${{ env.PR_BODY_PATH }}
+      - name: Commit Status Pending
+        uses: myrotvorets/set-commit-status-action@3730c0a348a2ace3c110851bed53331bc6406e9f  # v2.0.1
+        with:
+          sha: dc07b2574ba38bc12632ef518b458a99b9991b5a
+          description: Prerelease Deployment for X
 
-          if grep -q '${{ env.PRERELEASE_SECTION_REGEX }}' ${{ env.PR_BODY_PATH }}; then  # there is an existing prerelease section
-            # Replace the existing prerelease section
-            awk '{gsub(/${{ env.PRERELEASE_SECTION_REGEX }}/, "${{ env.PRERELEASE_SECTION }}")}1' ${{ env.PR_BODY_PATH }} > ${{ env.PR_BODY_PATH_UPDATED }}
-          else  # a new section is added, with a delimiting section
-            awk '1; END {print "\n---\n${{ env.PRERELEASE_SECTION }}"}' ${{ env.PR_BODY_PATH }} > ${{ env.PR_BODY_PATH_UPDATED }}
-          fi
-          gh pr edit 22 --repo ${{ github.repository }} --body-file ${{ env.PR_BODY_PATH_UPDATED }}
+      - run: sleep 10
+
+      - name: Commit Status Failed
+        uses: myrotvorets/set-commit-status-action@3730c0a348a2ace3c110851bed53331bc6406e9f  # v2.0.1
+        with:
+          sha: dc07b2574ba38bc12632ef518b458a99b9991b5a
+          status: failure
+          description: Prerelease Deployment for X
