@@ -11,19 +11,17 @@ jobs:
       - name: PR Description Notifier
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_BODY_FILE_LOCATION: ./body.txt
-          LATEST_PRERELEASE_SECTION_REGEX: "^:rocket: .* :rocket:$"
-          LATEST_PRERELEASE_SECTION_ESCAPED: ":rocket: The latest prerelease \\`x/y\\` is \\[here\\]\\(http://example.org\\) :rocket:"
+          PR_BODY_PATH: ./body.txt
+          PR_BODY_PATH_UPDATED: ./updated.body.txt
+          PRERELEASE_SECTION_REGEX: "^:rocket: .* :rocket:$"
+          PRERELEASE_SECTION: ":rocket: The latest prerelease `x/y` is [here](http://example.org) :rocket:"
         run: |
-          gh pr view 22 --repo ${{ github.repository }} --json body --jq .body > ${{ env.PR_BODY_FILE_LOCATION }}
+          gh pr view 22 --repo ${{ github.repository }} --json body --jq .body > ${{ env.PR_BODY_PATH }}
 
-          if grep -q '${{ env.LATEST_PRERELEASE_SECTION_REGEX }}' ${{ env.PR_BODY_FILE_LOCATION }}; then  # there is an existing prerelease section
+          if grep -q '${{ env.PRERELEASE_SECTION_REGEX }}' ${{ env.PR_BODY_PATH }}; then  # there is an existing prerelease section
             # Replace the existing prerelease section
-            sed -i 's|${{ env.LATEST_PRERELEASE_SECTION_REGEX }}|${{ env.LATEST_PRERELEASE_SECTION_ESCAPED }}|g' ${{ env.PR_BODY_FILE_LOCATION }}
+            awk '{gsub(/${{ env.PRERELEASE_SECTION_REGEX }}/, "${{ env.PRERELEASE_SECTION }}")}1' ${{ env.PR_BODY_PATH }} > ${{ env.PR_BODY_PATH_UPDATED }}
           else  # a new section is added, with a delimiting section
-            sed -i '$a\'"
-
-            ---
-            ${{ env.LATEST_PRERELEASE_SECTION_ESCAPED }}" ${{ env.PR_BODY_FILE_LOCATION }}
+            awk '1; END {print "\n---\n${{ env.PRERELEASE_SECTION }}"}' ${{ env.PR_BODY_PATH }} > ${{ env.PR_BODY_PATH_UPDATED }}
           fi
-          gh pr edit 22 --repo ${{ github.repository }} --body-file ${{ env.PR_BODY_FILE_LOCATION }}
+          gh pr edit 22 --repo ${{ github.repository }} --body-file ${{ env.PR_BODY_PATH_UPDATED }}
