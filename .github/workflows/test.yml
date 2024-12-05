@@ -15,3 +15,6 @@ jobs:
 
       - if: steps.commenter.outputs.has-permission == 'true'
         run: echo "Permission Granted"
+
+      - if: steps.commenter.outputs.has-permission == 'false'
+        run: echo "Permission Denied"
