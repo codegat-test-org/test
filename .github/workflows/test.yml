@@ -13,5 +13,5 @@ jobs:
       - id: commenter
         uses: access-nri/actions/.github/actions/commenter-permissions@17-perms-via-comment
 
-      - if: steps.commenter.outputs.has-permission
+      - if: steps.commenter.outputs.has-permission == 'true'
         run: echo "Permission Granted"
