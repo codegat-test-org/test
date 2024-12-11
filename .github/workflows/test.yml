@@ -1,5 +1,6 @@
 name: Test updating commit status
 on:
+  pull_request:
   issue_comment:
     types:
       - created
@@ -10,13 +11,7 @@ jobs:
     permissions:
       statuses: write
     steps:
-      - id: commenter
-        uses: access-nri/actions/.github/actions/commenter-permission-check@17-perms-via-comment
-        with:
-          minimum-permission: admin
-
-      - if: steps.commenter.outputs.has-permission == 'true'
-        run: echo "Permission Granted"
-
-      - if: steps.commenter.outputs.has-permission == 'false'
-        run: echo "Permission Denied"
+      - run: echo "${{ fromJson(github.event.issue) }}"
+      - if: ${{ ! github.event.pull_request.draft || ! github.event.issue.draft }}
+        run: |
+          echo "wooo"
