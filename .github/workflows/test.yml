@@ -11,7 +11,9 @@ jobs:
     permissions:
       statuses: write
     steps:
-      - run: echo "${{ fromJson(github.event.issue) }}"
+      - if: github.event.issue
+        run: echo "${{ toJson(github.event.issue) }}"
+
       - if: ${{ ! github.event.pull_request.draft || ! github.event.issue.draft }}
         run: |
           echo "wooo"
