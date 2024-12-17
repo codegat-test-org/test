@@ -8,7 +8,7 @@ jobs:
       matrix:
         number: [1, 2, 3, 4, 5]
     steps:
-      - run: echo "${{ matrix.number }}
+      - run: echo "${{ matrix.number }}"
       - run: if [[ "${{ matrix.number }}" == "2" ]]; then exit 1; fi
 
   failure-collector:
