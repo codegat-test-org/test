@@ -1,21 +1,19 @@
-name: Test updating commit status
+name: Test matrix stuff
 on:
-  pull_request:
-  issue_comment:
-    types:
-      - created
+  workflow_dispatch:
 jobs:
-  test:
-    name: test
+  matrixed-job:
     runs-on: ubuntu-latest
-    permissions:
-      statuses: write
+    strategy:
+      matrix:
+        number: [1, 2, 3, 4, 5]
     steps:
-      - if: github.event.issue
-        run: echo "${{ toJson(github.event.issue) }}"
+      - run: echo "${{ matrix.number }}
+      - run: if [[ "${{ matrix.number }}" == "2" ]]; then exit 1; fi
 
-      - if: >-
-          (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
-          (github.event_name == 'issue_comment' && !github.event.issue.draft)
-        run: |
-          echo "wooo"
+  failure-collector:
+    runs-on: ubuntu-latest
+    needs:
+      - matrixed-job
+    steps:
+      - run: echo "Wow, all of them passed!"
