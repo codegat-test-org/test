@@ -4,6 +4,8 @@ on:
 jobs:
   e:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: envs
         run: |
