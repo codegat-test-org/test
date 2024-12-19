@@ -1,19 +1,26 @@
-name: Test matrix stuff
+name: Test env stuff
 on:
   workflow_dispatch:
 jobs:
-  matrixed-job:
+  e:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        number: [1, 2, 3, 4, 5]
     steps:
-      - run: echo "${{ matrix.number }}"
-      - run: if [[ "${{ matrix.number }}" == "2" ]]; then exit 1; fi
+      - name: envs
+        run: |
+          echo "MSG<<EOF" >> $GITHUB_ENV
 
-  failure-collector:
-    runs-on: ubuntu-latest
-    needs:
-      - matrixed-job
-    steps:
-      - run: echo "Wow, all of them passed!"
+          for target in Gadi Setonix; do
+            echo "Wow, about to deploy to \`$target\` with:" >> $GITHUB_ENV
+            echo "* spack version $target" >> $GITHUB_ENV
+            echo "* spack-packages version $target" >> $GITHUB_ENV
+            echo "" >> $GITHUB_ENV
+          done
+          echo "EOF" >> $GITHUB_ENV
+
+          cat $GITHUB_ENV
+
+      - uses: access-nri/actions/.github/actions/comment@main
+        with:
+          number: 26
+          message: |
+            ${{ env.MSG }}
