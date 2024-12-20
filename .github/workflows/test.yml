@@ -9,20 +9,12 @@ jobs:
     steps:
       - name: envs
         run: |
-          echo "MSG<<EOF" >> $GITHUB_ENV
+          echo "Gadi_thingo=woweeeee" >> $GITHUB_ENV
+          echo "Setonix_thingo=wooooo" >> $GITHUB_ENV
 
+      - name: echo stuff
+        run: |
           for target in Gadi Setonix; do
-            echo "Wow, about to deploy to \`$target\` with:" >> $GITHUB_ENV
-            echo "* spack version $target" >> $GITHUB_ENV
-            echo "* spack-packages version $target" >> $GITHUB_ENV
-            echo "" >> $GITHUB_ENV
+            target_thingo="$target_thingo"
+            echo "${!target_thingo}"
           done
-          echo "EOF" >> $GITHUB_ENV
-
-          cat $GITHUB_ENV
-
-      - uses: access-nri/actions/.github/actions/comment@main
-        with:
-          number: 26
-          message: |
-            ${{ env.MSG }}
