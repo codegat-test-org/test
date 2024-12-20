@@ -15,6 +15,6 @@ jobs:
       - name: echo stuff
         run: |
           for target in Gadi Setonix; do
-            target_thingo="$target_thingo"
+            target_thingo="${target}_thingo"
             echo "${!target_thingo}"
           done
