@@ -4,17 +4,5 @@ on:
 jobs:
   e:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
-      - name: envs
-        run: |
-          echo "Gadi_thingo=woweeeee" >> $GITHUB_ENV
-          echo "Setonix_thingo=wooooo" >> $GITHUB_ENV
-
-      - name: echo stuff
-        run: |
-          for target in Gadi Setonix; do
-            target_thingo="${target}_thingo"
-            echo "${!target_thingo}"
-          done
+      - run: yq --version
