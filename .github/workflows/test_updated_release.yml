@@ -100,6 +100,8 @@ jobs:
             filename=$(basename -- "$file")
             target="${filename##*.}"
 
+            echo "fn: $filename, target: $target"
+
             # For brevity, '-cr' is '--compact-output --raw-output'
             spack_version=$(jq -cr '.spack_version' "$file")
             spack_config_version=$(jq -cr '.spack_config_version' "$file")
