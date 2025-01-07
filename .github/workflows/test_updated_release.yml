@@ -23,7 +23,10 @@ jobs:
         run: |
           mkdir -p ${{ env.METADATA_PATH }}
           cd ${{ env.METADATA_PATH }}
-          touch spack.yaml spack.lock spack.location spack.location.json
+          echo '1' > spack.yaml
+          echo '1' > spack.lock
+          echo '1' > spack.location
+          echo '1' > spack.location.json
           cd -
 
           cd ${{ env.METADATA_PATH }}
