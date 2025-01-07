@@ -53,8 +53,8 @@ jobs:
       - name: Upload Metadata Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.METADATA_FNAME }}.${{ matrix.target }}
-          path: ${{ env.METADATA_FNAME }}.${{ matrix.target }}
+          name: ${{ env.OUTPUTS_FNAME }}.${{ matrix.target }}
+          path: ${{ env.OUTPUTS_FNAME }}.${{ matrix.target }}
 
   release:
     name: Create Release
