@@ -100,16 +100,14 @@ jobs:
             filename=$(basename -- "$file")
             target="${filename##*.}"
 
-            echo "fn: $filename, target: $target"
-
             # For brevity, '-cr' is '--compact-output --raw-output'
             spack_version=$(jq -cr '.spack_version' "$file")
             spack_config_version=$(jq -cr '.spack_config_version' "$file")
             spack_packages_version=$(jq -cr '.spack_packages_version' "$file")
             deployment_modules_location=$(jq -cr '.deployment_modules_location' "$file")
 
-            echo "### \`$target\`"
-            echo "Deployed using [spack $spack_version](https://github.com/ACCESS-NRI/spack/tree/releases/$spack_version), [spack-packages $spack_packages_version](https://github.com/ACCESS-NRI/spack-packages/releases/tag/$spack_packages_version) and [spack-config $spack_config_version](https://github.com/ACCESS-NRI/spack-config/releases/tag/$spack_config_version)."
+            echo "### \`$target\`" >> $GITHUB_OUTPUT
+            echo "Deployed using [spack $spack_version](https://github.com/ACCESS-NRI/spack/tree/releases/$spack_version), [spack-packages $spack_packages_version](https://github.com/ACCESS-NRI/spack-packages/releases/tag/$spack_packages_version) and [spack-config $spack_config_version](https://github.com/ACCESS-NRI/spack-config/releases/tag/$spack_config_version)." >> $GITHUB_OUTPUT
             echo "Deployed as module accessible using:" >> $GITHUB_OUTPUT
             echo "\`\`\`bash" >> $GITHUB_OUTPUT
             echo "module use $deployment_modules_location" >> $GITHUB_OUTPUT
