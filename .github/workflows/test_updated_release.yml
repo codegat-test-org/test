@@ -1,0 +1,134 @@
+name: Test Release Note Generation
+on:
+  workflow_dispatch:
+env:
+  MODEL_NAME: access-om2
+  TAG_NAME: v1.0.0
+  ROOT_SBD: access-om2
+  METADATA_GLOB: deploy-metadata.*
+  OUTPUTS_GLOB: deploy-outputs.*
+  METADATA_PATH: /opt/metadata
+  OUTPUTS_PATH: /opt/outputs
+  METADATA_FNAME: deploy-metadata
+  OUTPUTS_FNAME: deploy-outputs
+jobs:
+  setup:
+    name: Setup for Create Release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: ["Gadi", "Setonix"]
+    steps:
+      - name: Create Metadata Artifacts
+        run: |
+          mkdir -p ${{ env.METADATA_PATH }}
+          cd ${{ env.METADATA_PATH }}
+          touch spack.yaml spack.lock spack.location spack.location.json
+          cd -
+
+          for file in ${{ env.METADATA_PATH}}/*; do
+            mv "$file" "${{ matrix.target }}.$file"
+          done
+
+      - name: Upload Metadata Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.METADATA_FNAME }}.${{ matrix.target }}
+          path: ${{ env.METADATA_PATH }}/*
+
+      - name: Create Outputs Artifacts
+        run: |
+          mkdir -p ${{ env.OUTPUTS_PATH}}
+          cd ${{ env.OUTPUTS_PATH }}
+          jq --null-input \
+            '{
+              spack_version: "0.22",
+              spack_config_version: "2024.03.22",
+              spack_packages_version: "2024.03.22",
+              deployment_modules_location: "/some/modules"
+            }' > ${{ env.OUTPUTS_FNAME }}.${{ matrix.target }}
+
+      - name: Upload Metadata Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.METADATA_FNAME }}.${{ matrix.target }}
+          path: ${{ env.METADATA_FNAME }}.${{ matrix.target }}
+
+  release:
+    name: Create Release
+    needs:
+      - setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      url: ${{ steps.release.outputs.url }}
+      created-at: ${{ steps.metadata.outputs.created-at }}
+    steps:
+      - name: Download Metadata Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ env.METADATA_GLOB }}
+          path: ${{ env.METADATA_PATH }}
+          merge-multiple: true
+
+      - name: Download Outputs Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ env.OUTPUTS_GLOB }}
+          path: ${{ env.OUTPUTS_PATH}}
+          merge-multiple: true
+
+      - run: tree .
+
+      - name: Generate Release Notes
+        id: release-body
+        run: |
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+
+          echo "This is an official release of \`${{ env.MODEL_NAME }}\` \`${{ env.TAG_NAME }}\`. " >> $GITHUB_OUTPUT
+          echo "## Deployment Information"
+
+          for file in ${{ env.OUTPUTS_PATH }}/*; do
+            # Setting all the variables that would be needed for the release body creation...
+            filename=$(basename -- "$file")
+            target="${filename##*.}"
+
+            # For brevity, '-cr' is '--compact-output --raw-output'
+            spack_version=$(jq -cr '.spack_version' "$file")
+            spack_config_version=$(jq -cr '.spack_config_version' "$file")
+            spack_packages_version=$(jq -cr '.spack_packages_version' "$file")
+            deployment_modules_location=$(jq -cr '.deployment_modules_location' "$file")
+
+            echo "### \`$target\`"
+            echo "Deployed using [spack $spack_version](https://github.com/ACCESS-NRI/spack/tree/releases/$spack_version), [spack-packages $spack_packages_version](https://github.com/ACCESS-NRI/spack-packages/releases/tag/$spack_packages_version) and [spack-config $spack_config_version](https://github.com/ACCESS-NRI/spack-config/releases/tag/$spack_config_version)."
+            echo "Deployed as module accessible using:" >> $GITHUB_OUTPUT
+            echo "\`\`\`bash" >> $GITHUB_OUTPUT
+            echo "module use $deployment_modules_location" >> $GITHUB_OUTPUT
+            echo "module load ${{ env.ROOT_SBD }}/${{ env.TAG_NAME }}" >> $GITHUB_OUTPUT
+            echo "\`\`\`" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+          done
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: release
+        uses: softprops/action-gh-release@69320dbe05506a9a39fc8ae11030b214ec2d1f87  # v2.0.5
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: ${{ env.MODEL_NAME}} ${{ env.TAG_NAME }}
+          body: |
+            ${{ steps.release-body.outputs.body }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            ${{ env.METADATA_PATH }}/*.spack.yaml
+            ${{ env.METADATA_PATH }}/*.spack.lock
+            ${{ env.METADATA_PATH }}/*.spack.location
+            ${{ env.METADATA_PATH }}/*.spack.location.json
+
+      - name: Release Metadata
+        id: metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "created-at=$(gh release view --json createdAt --jq '.createdAt' --repo ${{ github.repository }})" >> $GITHUB_OUTPUT
