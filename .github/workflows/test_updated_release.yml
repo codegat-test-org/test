@@ -26,9 +26,11 @@ jobs:
           touch spack.yaml spack.lock spack.location spack.location.json
           cd -
 
+          cd ${{ env.METADATA_PATH }}
           for file in ${{ env.METADATA_PATH}}/*; do
             mv "$file" "${{ matrix.target }}.$file"
           done
+          cd -
 
       - name: Upload Metadata Artifacts
         uses: actions/upload-artifact@v4
