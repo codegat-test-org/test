@@ -27,7 +27,7 @@ jobs:
           cd -
 
           cd ${{ env.METADATA_PATH }}
-          for file in ${{ env.METADATA_PATH}}/*; do
+          for file in *; do
             mv "$file" "${{ matrix.target }}.$file"
           done
           cd -
