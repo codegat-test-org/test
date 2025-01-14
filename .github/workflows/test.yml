@@ -2,7 +2,25 @@ name: Test env stuff
 on:
   workflow_dispatch:
 jobs:
-  e:
+  up:
     runs-on: ubuntu-latest
     steps:
-      - run: yq --version
+      - run: |
+          mkdir -p scripts
+          echo "Hi" >> scripts/test.file
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: a
+          path: '.'
+
+  down:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: a
+
+      - run: tree .
