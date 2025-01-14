@@ -25,4 +25,4 @@ jobs:
         with:
           name: a
 
-      - run: tree .
+      - run: cat scripts/test.file
