@@ -5,10 +5,10 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Wow ${{ github.actor }} what a comment!" > file.txt
+      - run: echo "Wow ${{ github.actor }} what a comment!" > $GITHUB_WORKSPACE/file.txt
       - env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: access-nri/actions/.github/actions/pr-comment@pr-comment-allow-file
         with:
-          comment-file: ./file.txt
+          comment-file: $GITHUB_WORKSPACE/file.txt
           pr: 26
