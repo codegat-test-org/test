@@ -4,6 +4,8 @@ on:
 jobs:
   comment:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - run: |
           echo "Wow ${{ github.actor }} what a comment!" > ./file.txt
