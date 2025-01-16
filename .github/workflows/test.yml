@@ -1,18 +1,105 @@
-name: Test env stuff
+name: Test Jinja Generation
 on:
   workflow_dispatch:
+    inputs:
+      model:
+        type: string
+        default: ACCESS-OM2
+      prerelease-version:
+        type: string
+        default: 'pr12-2'
+      release-version:
+        type: string
+        default: '2024.04.29'
+      root-sbd:
+        type: string
+        default: access-om2
+      head-sha:
+        type: string
+        default: 2e7e23
+      deployment-errors:
+        type: boolean
+        default: false
+      config-errors:
+        type: boolean
+        default: false
+env:
+  OUTPUT_ARTIFACT_PATH: tests/scripts/jinja_template/inputs
+  TEMPLATED_OUTPUT_PATH: output.md
+  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 jobs:
-  comment:
+  deploy-comment-test:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
-      - run: |
-          echo "Wow ${{ github.actor }} what a comment!" > ./file.txt
-          cat ./file.txt
-      - env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: access-nri/actions/.github/actions/pr-comment@pr-comment-allow-file
+      - name: Checkout build-cd for scripts
+        uses: actions/checkout@v4
         with:
-          comment: Hello
-          pr: 26
+          repository: access-nri/build-cd
+          ref: 206-jinja-templating
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          cache: pip
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -q -q -r scripts/jinja_template/requirements.txt
+
+      - name: Create deployment message
+        id: matrix-output-parser
+        # Outputs defined in deploy-1-setup.yml under the outputs-upload job
+        # Creates a comment of the form: https://github.com/ACCESS-NRI/ACCESS-TEST/pull/15#issuecomment-2558675980
+        env:
+          J2_MODEL: ${{ inputs.model }}
+          J2_PRERELEASE_VERSION: ${{ inputs.prerelease-version }}
+          J2_ROOT_SBD: ${{ inputs.root-sbd }}
+          J2_DEPLOYMENT_ERRORS: ${{ inputs.deployment-errors }}
+          J2_CONFIG_ERRORS: ${{ inputs.config-errors }}
+          J2_HEAD_SHA: ${{ inputs.head-sha }}
+          J2_RUN_URL: ${{ env.RUN_URL }}
+        run: |
+          python -m scripts.jinja_template.render_deployment_info \
+            --template scripts/jinja_template/templates/deployment-comment-body.md.j2 \
+            --deployment-outputs ${{ env.OUTPUT_ARTIFACT_PATH }} \
+            --output ${{ env.TEMPLATED_OUTPUT_PATH }}
+
+      - name: PR Comment Notifier
+        run: cat ${{ env.TEMPLATED_OUTPUT_PATH }}
+
+  release-notes-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout build-cd for scripts
+        uses: actions/checkout@v4
+        with:
+          repository: access-nri/build-cd
+          ref: 206-jinja-templating
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          cache: pip
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -q -q -r scripts/jinja_template/requirements.txt
+
+      - name: Generate Release Notes
+        id: release-body
+        env:
+          J2_MODEL: ${{ inputs.model }}
+          J2_VERSION: ${{ inputs.release-version }}
+          J2_ROOT_SBD: ${{ inputs.root-sbd }}
+        run: |
+          python -m scripts.jinja_template.render_deployment_info \
+            --template scripts/jinja_template/templates/release-body.md.j2 \
+            --deployment-outputs ${{ env.OUTPUT_ARTIFACT_PATH }} \
+            --output ${{ env.TEMPLATED_OUTPUT_PATH }}
+
+      - name: PR Comment Notifier
+        run: cat ${{ env.TEMPLATED_OUTPUT_PATH }}
