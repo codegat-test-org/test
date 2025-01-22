@@ -16,4 +16,4 @@ jobs:
       - id: generate
         run: echo "list='["One", "Two", "Three", "Four", "Five"]'" >> $GITHUB_OUTPUT
 
-      - run: echo "${{ join(steps.generate.outputs.list, '\n') }}"
+      - run: echo "${{ join(fromJson(steps.generate.outputs.list), '\n') }}"
