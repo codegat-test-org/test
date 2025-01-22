@@ -1,11 +1,19 @@
-name: Test Jinja Generation
+name: Test
 on:
   workflow_dispatch:
 jobs:
-  join-test:
+  join-string-test:
     runs-on: ubuntu-latest
     steps:
       - id: generate
         run: echo "list='One Two Three Four Five'" >> $GITHUB_OUTPUT
+
+      - run: echo "${{ join(steps.generate.outputs.list, '\n') }}"
+
+  join-array-string-test:
+    runs-on: ubuntu-latest
+    steps:
+      - id: generate
+        run: echo "list='["One", "Two", "Three", "Four", "Five"]'" >> $GITHUB_OUTPUT
 
       - run: echo "${{ join(steps.generate.outputs.list, '\n') }}"
