@@ -5,15 +5,9 @@ jobs:
   join-string-test:
     runs-on: ubuntu-latest
     steps:
-      - id: generate
-        run: echo "list='One Two Three Four Five'" >> $GITHUB_OUTPUT
+      - id: targets
+        uses: access-nri/build-cd/.github/actions/get-target-matrix@209-support-deployment-target-choice
+        with:
+          targets: "Gadi Setonix"
 
-      - run: echo "${{ join(steps.generate.outputs.list, '\n') }}"
-
-  join-array-string-test:
-    runs-on: ubuntu-latest
-    steps:
-      - id: generate
-        run: echo "list='["One", "Two", "Three", "Four", "Five"]'" >> $GITHUB_OUTPUT
-
-      - run: echo "${{ join(fromJson(steps.generate.outputs.list), '\n') }}"
+      - run: echo "${{ steps.targets.outputs.valid-targets }}"
