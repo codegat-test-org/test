@@ -2,12 +2,15 @@ name: Test
 on:
   workflow_dispatch:
 jobs:
-  join-string-test:
+  var1:
     runs-on: ubuntu-latest
+    env:
+      VAR: Release
     steps:
-      - id: targets
-        uses: access-nri/build-cd/.github/actions/get-target-matrix@209-support-deployment-target-choice
-        with:
-          targets: "Gadi Setonix"
-
-      - run: echo "${{ steps.targets.outputs.valid-targets }}"
+      - run: echo "Hello ${{ env.VAR != 'Release' && env.VAR }}"
+  var2:
+    runs-on: ubuntu-latest
+    env:
+      VAR: Prerelease
+    steps:
+      - run: echo "Hello ${{ env.VAR != 'Release' && env.VAR }}"
