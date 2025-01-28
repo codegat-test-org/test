@@ -4,13 +4,10 @@ on:
 jobs:
   var1:
     runs-on: ubuntu-latest
-    env:
-      VAR: Release
     steps:
-      - run: echo "Hello ${{ env.VAR != 'Release' && env.VAR }}"
-  var2:
-    runs-on: ubuntu-latest
-    env:
-      VAR: Prerelease
-    steps:
-      - run: echo "Hello ${{ env.VAR != 'Release' && env.VAR }}"
+      - id: t
+        uses: access-nri/build-cd/.github/actions/get-target-matrix@dev-121-multi-target-workflows_TEST
+        with:
+          targets: GadiTest
+
+      - run: echo "${{ steps.t.outputs.valid-targets }}"
