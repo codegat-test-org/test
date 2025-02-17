@@ -5,6 +5,8 @@ jobs:
   t:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "TOKENS=($(head -n 1 <<< "some bunch of commands"))" >> $GITHUB_ENV
+      - run: echo "TOKENS=\"($(head -n 1 <<< "some bunch of commands"))\"" >> $GITHUB_ENV
 
       - run: echo "${TOKENS[1]}"
+
+      - run: for i in "!TOKENS[@]"; do echo "${i}"
