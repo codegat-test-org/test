@@ -1,24 +1,24 @@
 name: Test
 on:
   workflow_dispatch:
+    inputs:
+      upterm:
+        description: 'Run the job in upterm'
+        required: false
+        default: false
+        type: boolean
 jobs:
-  setup:
+  container:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.m.outputs.matrix }}
+    container:
+      image: python:3.8
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: access-nri/build-cd
-      - id: m
-        run: echo "matrix=$(jq -cr '.deployment | keys' config/settings.json)" >> $GITHUB_OUTPUT
 
-  matrix:
-    runs-on: ubuntu-latest
-    needs:
-      - setup
-    strategy:
-      matrix:
-        target: ${{ fromJson(needs.setup.outputs.matrix) }}
-    steps:
-      - run: echo ${{ matrix.target }}
+      - name: Setup upterm session
+        if: ${{ github.event.inputs.upterm == true }}
+        uses: lhotari/action-upterm@v1
+        with:
+          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+          limit-access-to-actor: true
+          wait-timeout-minutes: 2
