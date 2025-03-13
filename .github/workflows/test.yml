@@ -2,7 +2,7 @@ name: Test
 on:
   workflow_dispatch:
     inputs:
-      upterm:
+      tmate:
         description: 'Run the job in upterm'
         required: false
         default: false
@@ -15,10 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup upterm session
-        if: ${{ github.event.inputs.upterm == 'true' }}
-        uses: lhotari/action-upterm@v1
+      - name: Setup tmate session
+        if: ${{ github.event.inputs.tmate == 'true' }}
+        uses: mxschmitt/action-tmate@v3
         with:
-          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+          sudo: false
+          detached: true
           limit-access-to-actor: true
-          wait-timeout-minutes: 2
