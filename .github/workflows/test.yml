@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup upterm session
-        if: ${{ github.event.inputs.upterm == true }}
+        if: ${{ github.event.inputs.upterm == 'true' }}
         uses: lhotari/action-upterm@v1
         with:
           ## limits ssh access and adds the ssh public key for the user which triggered the workflow
