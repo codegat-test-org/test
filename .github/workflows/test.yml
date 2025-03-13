@@ -15,6 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: touch inside-container.txt
+
       - name: Setup tmate session
         if: ${{ github.event.inputs.tmate == 'true' }}
         uses: mxschmitt/action-tmate@v3
