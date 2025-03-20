@@ -1,26 +1,16 @@
-name: Test
+name: Test Draft Steps
 on:
-  workflow_dispatch:
-    inputs:
-      tmate:
-        description: 'Run the job in upterm'
-        required: false
-        default: false
-        type: boolean
+  pull_request:
+  issue_comment:
 jobs:
-  container:
+  draft-stuff:
     runs-on: ubuntu-latest
-    container:
-      image: python:3.8
     steps:
-      - uses: actions/checkout@v4
+      - name: Non-draft step
+        run: echo "echo "${{ toJson(github.event)}}"
 
-      - run: touch inside-container.txt
-
-      - name: Setup tmate session
-        if: ${{ github.event.inputs.tmate == 'true' }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
-          detached: true
-          limit-access-to-actor: true
+      - name: Draft step
+        if: >-
+          (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
+          (github.event_name == 'issue_comment' && !github.event.issue.draft)
+        run: echo "This is a draft step"
