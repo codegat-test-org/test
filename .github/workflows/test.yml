@@ -6,11 +6,16 @@ jobs:
   draft-stuff:
     runs-on: ubuntu-latest
     steps:
-      - name: Non-draft step
-        run: echo "${{ toJson(github.event) }}"
+      - name: Regular step
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "PR Draft status: ${{ github.event.pull_request.draft }}"
+          echo "Issue Draft status: ${{ github.event.issue.draft }}"
+          echo "------------------------------"
+          echo "${{ toJson(github.event) }}"
 
-      - name: Draft step
+      - name: Non-draft step
         if: >-
           (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
           (github.event_name == 'issue_comment' && !github.event.issue.draft)
-        run: echo "This is a draft step"
+        run: echo "This is a non-draft step"
