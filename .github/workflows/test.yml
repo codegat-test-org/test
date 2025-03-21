@@ -6,16 +6,22 @@ jobs:
   draft-stuff:
     runs-on: ubuntu-latest
     steps:
-      - name: Regular step
+      - name: Fail step 1
+        id: check-1
+        continue-on-error: true
         run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "PR Draft status: ${{ github.event.pull_request.draft }}"
-          echo "Issue Draft status: ${{ github.event.issue.draft }}"
-          echo "------------------------------"
-          echo "${{ toJson(github.event) }}"
+          echo "::error::Something went wrong"
+          exit 1
 
-      - name: Non-draft step
-        if: >-
-          (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
-          (github.event_name == 'issue_comment' && !github.event.issue.draft)
-        run: echo "This is a non-draft step"
+      - name: Succeed step 1
+        id: check-2
+        continue-on-error: true
+        run: |
+          echo "Something went right"
+          echo "Step 2"
+
+      - name: Exit if failed
+        if: steps.check-1.outcome == 'failure' || steps.check-2.outcome == 'failure'
+        run: |
+          echo "::error::One of the steps failed"
+          exit 1
