@@ -1,7 +1,6 @@
 name: Test Draft Steps
 on:
-  pull_request:
-  issue_comment:
+  workflow_dispatch:
 jobs:
   draft-stuff:
     runs-on: ubuntu-latest
