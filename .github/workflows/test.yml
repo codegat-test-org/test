@@ -1,27 +1,25 @@
 name: Test Draft Steps
 on:
-  workflow_dispatch:
-    inputs:
-      prerelease:
-        description: 'Is this a prerelease?'
-        required: true
-        default: true
-        type: boolean
-      release:
-        description: 'Is this a release?'
-        required: true
-        default: false
-        type: boolean
+  pull_request:
 jobs:
-  draft-stuff:
+  bools:
     runs-on: ubuntu-latest
+    env:
+      IS_DRAFT: ${{ (github.event_name == 'pull_request' && github.event.pull_request.draft) || (github.event_name == 'issue_comment' && github.event.issue.draft) }}
     steps:
-      - name: Check conditional
+      - name: Check if draft
         run: |
-          echo "Pre: ${{ inputs.prerelease }}, Release: ${{ inputs.release }}"
-          echo "Issue Draft = ${{ github.event_name == 'issue_comment' && github.event.issue.draft }}"
-          echo "PR Draft = ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}"
-          echo "Not Issue Draft = ${{ github.event_name == 'issue_comment' && !github.event.issue.draft }}"
-          echo "Not PR Draft = ${{ github.event_name == 'pull_request' && !github.event.pull_request.draft }}"
-          echo "Drafted or Release = ${{ inputs.prerelease && (!github.event.issue.draft || !github.event.pull_request.draft) }}"
-          echo "Drafted = ${{ inputs.prerelease && (!github.event.issue.draft || !github.event.pull_request.draft) || inputs.release }}"
+          echo "Is draft: ${{ env.IS_DRAFT }}"
+
+      - name: Check if draft (env bool)
+        if: ${{ env.IS_DRAFT }}
+        run: echo "Yep it's a draft (env format)"
+
+      - name: Check if draft (env str)
+        if: ${{ env.IS_DRAFT == 'true' }}
+        run: echo "Yep it's a draft (env format)"
+
+
+      - name: Check if draft (normal)
+        if: (github.event_name == 'pull_request' && github.event.pull_request.draft) || (github.event_name == 'issue_comment' && github.event.issue.draft)
+        run: echo "Yep it's a draft (normal format)"
