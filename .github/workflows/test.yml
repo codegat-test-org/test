@@ -1,26 +1,22 @@
 name: Test Draft Steps
 on:
   workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: true
+        default: true
+        type: boolean
+      release:
+        description: 'Is this a release?'
+        required: true
+        default: false
+        type: boolean
 jobs:
   draft-stuff:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail step 1
-        id: check-1
-        continue-on-error: true
+      - name: Check conditional
         run: |
-          echo "::error::Something went wrong"
-          exit 1
-
-      - name: Succeed step 1
-        id: check-2
-        continue-on-error: true
-        run: |
-          echo "Something went right"
-          echo "Step 2"
-
-      - name: Exit if failed
-        if: steps.check-1.outcome == 'failure' || steps.check-2.outcome == 'failure'
-        run: |
-          echo "::error::One of the steps failed"
-          exit 1
+          echo "Drafted or Release = ${{ inputs.prerelease && (!github.event.issue.draft || !github.event.pull_request.draft) }}"
+          echo "Drafted = ${{ inputs.prerelease && (!github.event.issue.draft || !github.event.pull_request.draft) || inputs.release }}"
