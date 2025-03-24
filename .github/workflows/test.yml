@@ -1,6 +1,6 @@
 name: Test Draft Steps
 on:
-  pull_request:
+  workflow_dispatch:
 jobs:
   bools:
     runs-on: ubuntu-latest
