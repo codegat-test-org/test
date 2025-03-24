@@ -4,22 +4,12 @@ on:
 jobs:
   bools:
     runs-on: ubuntu-latest
-    env:
-      IS_DRAFT: ${{ (github.event_name == 'pull_request' && github.event.pull_request.draft) || (github.event_name == 'issue_comment' && github.event.issue.draft) }}
     steps:
-      - name: Check if draft
-        run: |
-          echo "Is draft: ${{ env.IS_DRAFT }}"
+      - run: |
+          cat <<EOF >> my.file
+          repos::
+            - something
+            - $spack/else
+          EOF
 
-      - name: Check if draft (env bool)
-        if: ${{ env.IS_DRAFT }}
-        run: echo "Yep it's a draft (env format)"
-
-      - name: Check if draft (env str)
-        if: ${{ env.IS_DRAFT == 'true' }}
-        run: echo "Yep it's a draft (env format)"
-
-
-      - name: Check if draft (normal)
-        if: (github.event_name == 'pull_request' && github.event.pull_request.draft) || (github.event_name == 'issue_comment' && github.event.issue.draft)
-        run: echo "Yep it's a draft (normal format)"
+          cat my.file
