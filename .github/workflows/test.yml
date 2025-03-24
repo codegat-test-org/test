@@ -6,10 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          cat <<EOF >> my.file
-          repos::
-            - something
-            - $spack/else
+          echo "spack:" > my.file
+          cat << 'EOF' >> my.file
+            repos::
+              - something
+              - $spack/else
           EOF
 
           cat my.file
