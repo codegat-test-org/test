@@ -9,14 +9,22 @@ jobs:
       env:
         MY_ENV: "my env"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: export ENV_COMPILER_PKG_VERSION as env
+        run: echo "ENV_COMPILER_PKG_VERSION=$ENV_COMPILER_PKG_VERSION" >> $GITHUB_ENV
+
+      - name: export ENV_COMPILER_PKG_VERSION as output
+        id: cpv
+        run: echo "ENV_COMPILER_PKG_VERSION=$ENV_COMPILER_PKG_VERSION" >> $GITHUB_OUTPUT
 
       - run: env
 
       - run: |
           echo "bash: $ENV_COMPILER_PKG_VERSION"
-          echo "bash: ${{ env.ENV_COMPILER_PKG_VERSION }}"
+          echo "gha: ${{ env.ENV_COMPILER_PKG_VERSION }}"
+          echo "output: ${{ steps.cpv.outputs.ENV_COMPILER_PKG_VERSION }}"
 
       - if: env.ENV_COMPILER_PKG_VERSION == '2021.2.0'
+        run: echo "2021.2.0"
+
+      - if: steps.cpv.outputs.ENV_COMPILER_PKG_VERSION == '2021.2.0'
         run: echo "2021.2.0"
