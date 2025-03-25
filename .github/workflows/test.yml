@@ -5,7 +5,7 @@ jobs:
   container:
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:20.04
+      image: ghcr.io/access-nri/base-spack-intel2021.2.0-2025.03.005:latest
       env:
         MY_ENV: "my env"
     steps:
