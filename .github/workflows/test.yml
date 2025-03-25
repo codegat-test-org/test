@@ -15,13 +15,8 @@ jobs:
       - run: env
 
       - run: |
-          echo "Via gha ${{ env.SHLVL }}"
-          echo "Via env $SHLVL"
-          echo "my env is ${{ env.MY_ENV }}"
-          echo "or $MY_ENV"
+          echo "bash: $ENV_COMPILER_PKG_VERSION"
+          echo "bash: ${{ env.ENV_COMPILER_PKG_VERSION }}"
 
-      - if: env.SHLVL == '2'
-        run: echo "SHLVL is 2"
-
-      - if: env.MY_ENV == 'my env'
-        run: echo "MY_ENV is my env"
+      - if: env.ENV_COMPILER_PKG_VERSION == '2021.2.0'
+        run: echo "2021.2.0"
