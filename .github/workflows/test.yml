@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - run: env
+
       - run: |
           echo "Via gha ${{ env.SHLVL }}"
           echo "Via env $SHLVL"
