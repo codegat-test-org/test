@@ -2,15 +2,23 @@ name: Test Draft Steps
 on:
   workflow_dispatch:
 jobs:
-  bools:
+  container:
     runs-on: ubuntu-latest
+    container:
+      image: ubuntu:20.04
+      env:
+        MY_ENV: "my env"
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - run: |
-          echo "spack:" > my.file
-          cat << 'EOF' >> my.file
-            repos::
-              - something
-              - $spack/else
-          EOF
+          echo "Via gha ${{ env.SHLVL }}"
+          echo "Via env $SHLVL"
+          echo "my env is ${{ env.MY_ENV }}"
+          echo "or $MY_ENV"
 
-          cat my.file
+      - if: env.SHLVL == '2'
+        run: echo "SHLVL is 2"
+
+      - if: env.MY_ENV == 'my env'
+        run: echo "MY_ENV is my env"
