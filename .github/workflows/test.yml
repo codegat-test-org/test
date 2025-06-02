@@ -1,32 +1,50 @@
 name: Test Draft Steps
 on:
-  workflow_dispatch:
+  pull_request:
+    paths:
+      - '**/spack.yaml'
+  issue_comment:
 jobs:
-  container:
+  setup-pr-ci:
+    name: Setup PR CI
+    if: >-
+      (github.event_name == 'pull_request' && github.event.action != 'closed') ||
+      (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!redeploy'))
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/access-nri/base-spack-intel2021.2.0-2025.03.005:latest
-      env:
-        MY_ENV: "my env"
+    outputs:
+      manifest-names: ${{ steps.changed-files.outputs.all_changed_files }}
     steps:
-      - name: export ENV_COMPILER_PKG_VERSION as env
-        run: echo "ENV_COMPILER_PKG_VERSION=$ENV_COMPILER_PKG_VERSION" >> $GITHUB_ENV
+      - name: Get PR HEAD
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.event.issue.number }} \
+        run: |
+          head=$(gh pr view \
+            ${{ env.PR_NUMBER }} \
+            --repo ${{ github.repository }} \
+            --json headRefName \
+            --jq '.headRefName'
+          )
 
-      - name: export ENV_COMPILER_PKG_VERSION as output
-        id: cpv
-        run: echo "ENV_COMPILER_PKG_VERSION=$ENV_COMPILER_PKG_VERSION" >> $GITHUB_OUTPUT
+          echo "For ${{ github.event_name }} the PR number is ${{ env.PR_NUMBER }} and the head is $head"
 
-      - run: env
+          echo "head=$head" >> $GITHUB_OUTPUT
 
-      - run: |
-          echo "bash: $ENV_COMPILER_PKG_VERSION"
-          echo "gha: ${{ env.ENV_COMPILER_PKG_VERSION }}"
-          echo "output: ${{ steps.cpv.outputs.ENV_COMPILER_PKG_VERSION }}"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.pr.outputs.head }}
 
-      - if: env.ENV_COMPILER_PKG_VERSION == '2021.2.0'
-        run: echo "2021.2.0"
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c  # v46.0.6
+        with:
+          since_last_remote_commit: true
+          json: true
+          files: |
+            **/spack.yaml
 
-      - if: steps.cpv.outputs.ENV_COMPILER_PKG_VERSION == '2021.2.0'
-        run: echo "2021.2.0"
-
-      - run: docker container ps
+      - name: DEBUG
+        run: |
+          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
