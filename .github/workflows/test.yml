@@ -12,7 +12,7 @@ jobs:
 
       - run: echo "val=new" >> $GITHUB_OUTPUT
         id: new-output
-        if: ${{ steps.default-output.outputs.val == 'wowee' }}
+        # if: ${{ steps.default-output.outputs.val == 'wowee' }}
 
   get-default-output:
     runs-on: ubuntu-latest
