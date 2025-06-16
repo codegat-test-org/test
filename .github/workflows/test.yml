@@ -1,91 +1,21 @@
-name: Test Draft Steps
+name: Test Default Values
 on:
-  pull_request:
-    paths:
-      - '**/spack.yaml'
-  push:
-    branches:
-      - main
-    paths:
-      - '**/spack.yaml'
-  issue_comment:
+  workflow_dispatch:
 jobs:
-  setup-pr-ci:
-    name: Setup PR CI
-    if: >-
-      (github.event_name == 'pull_request' && github.event.action != 'closed') ||
-      (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!redeploy'))
+  test-default-output:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-      no-fmt-matrix: ${{ steps.matrix.outputs.no-fmt-matrix }}
+      val: ${{ steps.new-output.outputs.val || env.val }}
     steps:
-      - name: Get PR HEAD
-        id: pr
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.event.issue.number }}
-        run: |
-          head=$(gh pr view \
-            ${{ env.PR_NUMBER }} \
-            --repo ${{ github.repository }} \
-            --json headRefName \
-            --jq '.headRefName'
-          )
+      - run: echo "val=default" >> $GITHUB_ENV
+        id: default-output
 
-          echo "For ${{ github.event_name }} the PR number is ${{ env.PR_NUMBER }} and the head is $head"
+      - run: echo "val=new" >> $GITHUB_OUTPUT
+        id: new-output
+        if: ${{ steps.default-output.outputs.val == 'wowee' }}
 
-          echo "head=$head" >> $GITHUB_OUTPUT
-
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ steps.pr.outputs.head }}
-
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c  # v46.0.6
-        with:
-          since_last_remote_commit: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
-          json: true
-          output_dir: .
-          write_output_files: true
-          files: |
-            **/spack.yaml
-
-      - name: Reformat
-        id: matrix
-        run: |
-          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-
-          echo "All changed files:"
-          cat all_changed_files.json
-          echo ""
-
-          jq -c '[.[] | {name: split("/")[0], path: .}]' all_changed_files.json > matrix.json
-
-          echo "Matrix:"
-          cat matrix.json
-          echo ""
-
-          echo "no-fmt-matrix=$(cat matrix.json)" >> $GITHUB_OUTPUT
-
-          quoted_formatted_matrix=$(jq -cR 'gsub("\""; "\"")' matrix.json)
-          echo "${quoted_formatted_matrix:1:-1}" > formatted_matrix.json
-
-          echo "Formatted Matrix:"
-          cat formatted_matrix.json
-
-          echo "matrix=$(cat formatted_matrix.json)" >> $GITHUB_OUTPUT
-
-  pr-ci-no-fmt:
+  get-default-output:
     runs-on: ubuntu-latest
-    needs:
-      - setup-pr-ci
-    strategy:
-      fail-fast: false
-      matrix:
-        manifests: ${{ fromJson(needs.setup-pr-ci.outputs.no-fmt-matrix) }}
+    needs: test-default-output
     steps:
-      - run: |
-          echo "No formatting needed for ${{ matrix.manifests.name }} at ${{ matrix.manifests.path }}"
+      - run: echo "Default output value is ${{ needs.test-default-output.outputs.val }}"
