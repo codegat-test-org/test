@@ -2,20 +2,19 @@ name: Test Default Values
 on:
   workflow_dispatch:
 jobs:
-  test-default-output:
+  test-git:
     runs-on: ubuntu-latest
-    outputs:
-      val: ${{ steps.new-output.outputs.val || env.val }}
     steps:
-      - run: echo "val=default" >> $GITHUB_ENV
-        id: default-output
+      - env:
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: url."https://${{ secrets.MY_TOKEN || secrets.GITHUB_TOKEN }}@github.com/".insteadOf
+          GIT_CONFIG_VALUE_0: https://github.com/
+        run: |
+          git clone https://github.com/ACCESS-NRI/GCOM4.git gcom4_1
 
-      - run: echo "val=new" >> $GITHUB_OUTPUT
-        id: new-output
-        # if: ${{ steps.default-output.outputs.val == 'wowee' }}
-
-  get-default-output:
-    runs-on: ubuntu-latest
-    needs: test-default-output
-    steps:
-      - run: echo "Default output value is ${{ needs.test-default-output.outputs.val }}"
+      - env:
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf
+          GIT_CONFIG_VALUE_0: https://github.com/
+        run: |
+          git clone https://github.com/ACCESS-NRI/GCOM4.git gcom4_2
