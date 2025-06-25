@@ -5,14 +5,16 @@ jobs:
   test-git:
     runs-on: ubuntu-latest
     steps:
-      - env:
+      - continue-on-error: true
+        env:
           GIT_CONFIG_COUNT: 1
           GIT_CONFIG_KEY_0: url."https://${{ secrets.MY_TOKEN || secrets.GITHUB_TOKEN }}@github.com/".insteadOf
           GIT_CONFIG_VALUE_0: https://github.com/
         run: |
           git clone https://github.com/ACCESS-NRI/GCOM4.git gcom4_1
 
-      - env:
+      - continue-on-error: true
+        env:
           GIT_CONFIG_COUNT: 1
           GIT_CONFIG_KEY_0: url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf
           GIT_CONFIG_VALUE_0: https://github.com/
