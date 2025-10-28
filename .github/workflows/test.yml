@@ -2,21 +2,36 @@ name: Test Default Values
 on:
   workflow_dispatch:
 jobs:
-  test-git:
+  test-checking-refs:
     runs-on: ubuntu-latest
     steps:
-      - continue-on-error: true
-        env:
-          GIT_CONFIG_COUNT: 1
-          GIT_CONFIG_KEY_0: url.https://git:${{ secrets.MY_TOKEN || secrets.GITHUB_TOKEN }}@github.com/.insteadOf
-          GIT_CONFIG_VALUE_0: https://github.com/
-        run: |
-          git clone https://github.com/ACCESS-NRI/GCOM4.git gcom4_1
+      - id: existing-tag
+        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        with:
+          repository: codegat-test-org/test
+          ref: v1.0.0
+
+      - id: existing-branch
+        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        with:
+          repository: codegat-test-org/test
+          ref: main
+
+      - id: existing-short-commit
+        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        with:
+          repository: codegat-test-org/test
+          ref: 55b01ae
+
+      - id: existing-full-commit
+        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        with:
+          repository: codegat-test-org/test
+          ref: 55b01aed1549e9075c9eb8366c383040604a9311
 
       - continue-on-error: true
-        env:
-          GIT_CONFIG_COUNT: 1
-          GIT_CONFIG_KEY_0: url.https://git:${{ secrets.GITHUB_TOKEN }}@github.com/.insteadOf
-          GIT_CONFIG_VALUE_0: https://github.com/
-        run: |
-          git clone https://github.com/ACCESS-NRI/GCOM4.git gcom4_2
+        id: non-existing-ref
+        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        with:
+          repository: codegat-test-org/test
+          ref: non-existing-ref
