@@ -11,15 +11,15 @@ jobs:
           repository: codegat-test-org/test
           ref: v1.0.0
 
-      - run: ls -a
+      - run: tree ..
 
       - id: existing-branch
         uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
         with:
-          repository: codegat-test-org/test
+          repository: access-nri/spack-packages
           ref: main
 
-      - run: ls -a
+      - run: tree ..
 
       - id: existing-short-commit
         uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
