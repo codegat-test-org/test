@@ -44,6 +44,8 @@ jobs:
       - uses: actions/checkout@v5
         with:
           path: ${{ env.repo-path }}
+          fetch-depth: 0
+          fetch-tags: true
 
       - id: existing-tag
         uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
