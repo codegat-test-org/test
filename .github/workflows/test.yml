@@ -2,40 +2,87 @@ name: Test Default Values
 on:
   workflow_dispatch:
 jobs:
-  test-checking-refs:
+  test-checkout-refs:
     runs-on: ubuntu-latest
     steps:
       - id: existing-tag
-        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
         with:
           repository: codegat-test-org/test
           ref: v1.0.0
 
-      - run: tree ..
-
       - id: existing-branch
-        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
         with:
           repository: access-nri/spack-packages
           ref: main
 
-      - run: tree ..
-
       - id: existing-short-commit
-        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
         with:
           repository: codegat-test-org/test
           ref: 55b01ae
 
       - id: existing-full-commit
-        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
         with:
           repository: codegat-test-org/test
           ref: 55b01aed1549e9075c9eb8366c383040604a9311
 
       - continue-on-error: true
         id: non-existing-ref
-        uses: access-nri/actions/.github/actions/get-git-ref-info@add-get-git-ref-info-action
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
         with:
           repository: codegat-test-org/test
           ref: non-existing-ref
+
+  test-local-refs:
+    runs-on: ubuntu-latest
+    env:
+      repo-path: some/other/repo
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ env.repo-path }}
+
+      - id: existing-tag
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
+        with:
+          repository-path: ${{ env.repo-path }}
+          ref: v1.0.0
+
+      - id: existing-short-commit
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
+        with:
+          repository-path: ${{ env.repo-path }}
+          ref: 55b01ae
+
+      - id: existing-full-commit
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
+        with:
+          repository-path: ${{ env.repo-path }}
+          ref: 55b01aed1549e9075c9eb8366c383040604a9311
+
+      - continue-on-error: true
+        id: non-existing-ref
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
+        with:
+          repository-path: ${{ env.repo-path }}
+          ref: non-existing-ref
+
+  test-invalid-parameters:
+    runs-on: ubuntu-latest
+    steps:
+      - continue-on-error: true
+        id: missing-both-repo-and-path
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
+        with:
+          ref: some-ref
+
+      - continue-on-error: true
+        id: both-repo-and-path
+        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
+        with:
+          repository: some/repo
+          repository-path: some/path
+          ref: some-ref
