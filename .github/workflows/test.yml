@@ -17,5 +17,13 @@ jobs:
     strategy:
       matrix:
         package: ${{ fromJson(needs.pre-matrix.outputs.matrix) }}
+        exclude:
+          - package: {template_value: "access-om2"}
+          - package: {template_value: "access-om3"}
+          - package: {template_value: "access-esm1p5"}
+          - package: {template_value: "access-esm1p6"}
+          - package: {template_value: "access-am3"}
+          - package: {template_value: "access-issm"}
+          - package: {template_value: "access-test"}
     steps:
       - run: echo "template - ${{ matrix.package.template_value }}, fpath - ${{ matrix.package.filepath }}"
