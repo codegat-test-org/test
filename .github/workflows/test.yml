@@ -1,90 +1,20 @@
-name: Test Default Values
+name: Test Matrix Complex Excludes
 on:
   workflow_dispatch:
 jobs:
-  test-checkout-refs:
+  pre-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - id: existing-tag
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository: codegat-test-org/test
-          ref: v1.0.0
+    - id: set-matrix
+      run: echo "matrix=[{"template":"A","filepath":"path/to/A"},{"template":"B","filepath":"path/to/B" },{"template":"C","filepath":"path/to/C" },{"template":"D","filepath":"path/to/D" }]" >> $GITHUB_OUTPUT
 
-      - id: existing-branch
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository: access-nri/spack-packages
-          ref: main
-
-      - id: existing-short-commit
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository: codegat-test-org/test
-          ref: 55b01ae
-
-      - id: existing-full-commit
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository: codegat-test-org/test
-          ref: 55b01aed1549e9075c9eb8366c383040604a9311
-
-      - continue-on-error: true
-        id: non-existing-ref
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository: codegat-test-org/test
-          ref: non-existing-ref
-
-  test-local-refs:
+  matrix:
+    needs: pre-matrix
     runs-on: ubuntu-latest
-    env:
-      repo-path: some/other/repo
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.pre-matrix.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v5
-        with:
-          path: ${{ env.repo-path }}
-          fetch-depth: 0
-          fetch-tags: true
-
-      - id: existing-tag
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository-path: ${{ env.repo-path }}
-          ref: v1.0.0
-
-      - id: existing-short-commit
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository-path: ${{ env.repo-path }}
-          ref: 55b01ae
-
-      - id: existing-full-commit
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository-path: ${{ env.repo-path }}
-          ref: 55b01aed1549e9075c9eb8366c383040604a9311
-
-      - continue-on-error: true
-        id: non-existing-ref
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository-path: ${{ env.repo-path }}
-          ref: non-existing-ref
-
-  test-invalid-parameters:
-    runs-on: ubuntu-latest
-    steps:
-      - continue-on-error: true
-        id: missing-both-repo-and-path
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          ref: some-ref
-
-      - continue-on-error: true
-        id: both-repo-and-path
-        uses: access-nri/actions/.github/actions/get-git-ref-info@get-git-ref-info-local-or-checkout
-        with:
-          repository: some/repo
-          repository-path: some/path
-          ref: some-ref
+      - run: echo "template - ${{ matrix.package.template }}, fpath - ${{ matrix.package.filepath }}"
