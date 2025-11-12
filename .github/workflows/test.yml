@@ -8,7 +8,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
     - id: set-matrix
-      run: echo "matrix=[{"template":"A","filepath":"path/to/A"},{"template":"B","filepath":"path/to/B" },{"template":"C","filepath":"path/to/C" },{"template":"D","filepath":"path/to/D" }]" >> $GITHUB_OUTPUT
+      run: |
+        echo "matrix=[{"template": "A","filepath": "path/to/A"},{"template": "B","filepath": "path/to/B" },{"template": "C","filepath": "path/to/C" },{"template": "D","filepath": "path/to/D"}]" >> $GITHUB_OUTPUT
 
   matrix:
     needs: pre-matrix
