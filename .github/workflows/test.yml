@@ -1,13 +1,14 @@
 name: Test Expression
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       my-input:
         required: false
         type: string
+        default: 'wow a default'
         description: testing out stuff
 jobs:
-  pre-matrix:
+  output:
     runs-on: ubuntu-latest
     steps:
-    - run: echo "${{ inputs.my-input || 'default value' }}"
+      - run: echo "Input - ${{ inputs.my-input }}"
