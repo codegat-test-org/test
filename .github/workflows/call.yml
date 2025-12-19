@@ -1,16 +1,17 @@
-name: Call Test Defaults
+name: Test Out Openstack Install
 on:
   workflow_dispatch:
 jobs:
-  no-arg:
-    uses: ./.github/workflows/test.yml
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
 
-  empty-arg:
-    uses: ./.github/workflows/test.yml
-    with:
-      my-input: ''
+      - uses: actions/checkout@v5
 
-  filled-arg:
-    uses: ./.github/workflows/test.yml
-    with:
-      my-input: 'a filled arg'
+      - run: pip install -r requirements.txt
+
+      - run: openstack --version
