@@ -10,4 +10,4 @@ jobs:
         with:
           ref: ''
 
-      - run: echo ${{ steps.checkout.outputs.commit }}
+      - run: echo ${{ steps.checkout.outputs.ref }} ${{ steps.checkout.outputs.commit }}
