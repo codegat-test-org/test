@@ -1,14 +1,12 @@
 name: Test Expression
 on:
-  workflow_call:
-    inputs:
-      my-input:
-        required: false
-        type: string
-        default: 'wow a default'
-        description: testing out stuff
+  pull_request:
+  workflow_dispatch:
 jobs:
-  output:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Input - ${{ inputs.my-input }}"
+  no-inputs:
+    uses: codegat-test-org/test/.github/workflows/call.yml@main
+
+  repo-input:
+    uses: codegat-test-org/test/.github/workflows/call.yml@main
+    with:
+      spack-manifest-repository: codegat-test-org/another-repo

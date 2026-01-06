@@ -1,13 +1,31 @@
 name: Test Out Checkout empty ref
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      spack-manifest-repository:
+        required: false
+        type: string
+        default: ${{ github.repository }}
+        description: |
+          The repository containing the spack manifest to install.
+          By default, this is the caller model component repository, which will work for most use-cases.
+          For example: ACCESS-NRI/access-test-component.
+      spack-manifest-repository-ref:
+        required: false
+        type: string
+        # If the inputs.spack-manifest-repository is the same as the caller repo, use the same heuristic as inputs.ref (use the caller SHA), otherwise use the default ref
+        default: ${{ inputs.spack-manifest-repository == github.repository && (github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha) || '' }}
+        description: |
+          The branch, tag, or commit SHA of the inputs.spack-manifest-repository to use.
+          For example: main, 2025.03.0, r23ij2o3.
 jobs:
-  install:
+  clone:
     runs-on: ubuntu-latest
     steps:
-      - id: checkout
+      - id: c
         uses: actions/checkout@v5
         with:
-          ref: ''
+          repository: ${{ inputs.spack-manifest-repository }}
+          ref: ${{ inputs.spack-manifest-repository-ref }}
 
-      - run: echo ${{ steps.checkout.outputs.ref }} ${{ steps.checkout.outputs.commit }}
+      - run: echo ${{ steps.c.outputs.ref }} ${{ steps.c.outputs.commit }}
