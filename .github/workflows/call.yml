@@ -1,17 +1,13 @@
-name: Test Out Openstack Install
+name: Test Out Checkout empty ref
 on:
   workflow_dispatch:
 jobs:
   install:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-python@v5
+      - id: checkout
+        uses: actions/checkout@v5
         with:
-          python-version: '3.11'
-          cache: pip
+          ref: ''
 
-      - run: pip install -r requirements.txt
-
-      - run: openstack --version
+      - run: echo ${{ steps.checkout.outputs.commit }}
