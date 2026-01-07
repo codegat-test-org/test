@@ -9,4 +9,4 @@ jobs:
   repo-input:
     uses: codegat-test-org/test/.github/workflows/call.yml@main
     with:
-      spack-manifest-repository: codegat-test-org/another-repo
+      spack-manifest-repository: codegat-test-org/test
