@@ -22,10 +22,29 @@ jobs:
   clone:
     runs-on: ubuntu-latest
     steps:
+      - name: Init - Initalize dynamic vars
+        id: init
+        # GitHub Actions doesn't allow expressions in the on.workflow_call.inputs.*.default section, so we need to define them here
+        # Furthermore, some outputs depend on the container being started, so we define them here as well
+        run: |
+          # Initializing dynamic default of inputs.spack-manifest-repository-ref...
+
+          if [[ "${{ inputs.spack-manifest-repository-ref }}" != "" ]]; then
+            echo "spack-manifest-repository-ref=${{ inputs.spack-manifest-repository-ref }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ inputs.spack-manifest-repository }}" == "${{ github.repository }}" ]]; then
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              echo "spack-manifest-repository-ref=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+            else
+              echo "spack-manifest-repository-ref=${{ github.sha }}" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "spack-manifest-repository-ref=''" >> $GITHUB_OUTPUT
+          fi
+
       - id: c
         uses: actions/checkout@v5
         with:
           repository: ${{ inputs.spack-manifest-repository }}
-          ref: ${{ inputs.spack-manifest-repository-ref }}
+          ref: ${{ steps.init.outputs.spack-manifest-repository-ref }}
 
-      - run: echo ${{ steps.c.outputs.ref }} ${{ steps.c.outputs.commit }}
+      - run: echo ${{ steps.init.outputs.spack-manifest-repository-ref }} ${{ steps.c.outputs.ref }} ${{ steps.c.outputs.commit }}
