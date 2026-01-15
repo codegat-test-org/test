@@ -1,12 +1,10 @@
 name: Test Expressions
 on:
-  pull_request:
   workflow_dispatch:
 jobs:
-  no-inputs:
-    uses: codegat-test-org/test/.github/workflows/call.yml@main
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  repo-input:
-    uses: codegat-test-org/test/.github/workflows/call.yml@main
-    with:
-      spack-manifest-repository: codegat-test-org/test
+      - uses: access-nri/build-cd/.github/actions/get-spack-manifest@spack-v1-migration-reserved-defs
