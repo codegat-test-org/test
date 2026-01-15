@@ -7,4 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: access-nri/build-cd/.github/actions/get-spack-manifest@spack-v1-migration-reserved-defs
+      - id: i
+        uses: access-nri/build-cd/.github/actions/get-spack-manifest@spack-v1-migration-reserved-defs
+
+      - run: echo "${{ steps.i.outputs.deployment-name }} ${{ steps.i.outputs.deployment-version }}"
