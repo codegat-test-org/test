@@ -1,13 +1,25 @@
 name: Test Expressions
 on:
   workflow_dispatch:
+    inputs:
+      run-self-hosted:
+        type: boolean
+        default: true
 jobs:
-  test:
+  spack-install-and-test:
+    name: Install and Test
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/access-nri/build-ci-runner:rocky-v0.22
+      volumes:
+        # For self-hosted runners, mount the proper upstream and buildcache volumes from the kubernetes cluster
+        # For GitHub-hosted runners, mount the upstream but add a dummy buildcache volume /dev/null to avoid errors or undefined behavior, eg. fromJson('[]')
+        - ${{ inputs.run-self-hosted && '/opt/upstream:/opt/upstream:ro' || 'upstream-data:/opt/upstream:ro' }}
+        - ${{ inputs.run-self-hosted && '/opt/runner_set_buildcache:/opt/runner_set_buildcache:rw' || '/dev/null:/dev/null:ro' }}
+    services:
+      upstream:
+        image: ${{ inputs.run-self-hosted && '' || 'ghcr.io/access-nri/build-ci-upstream:rocky-v0.22' }}
+        volumes:
+        - upstream-data:/opt/upstream:rw
     steps:
-      - uses: actions/checkout@v4
-
-      - id: i
-        uses: access-nri/build-cd/.github/actions/get-spack-manifest@spack-v1-migration-reserved-defs
-
-      - run: echo "${{ steps.i.outputs.deployment-name }} ${{ steps.i.outputs.deployment-version }}"
+    - run: ls -alh /opt/upstream
