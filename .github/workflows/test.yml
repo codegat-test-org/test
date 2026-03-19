@@ -18,7 +18,7 @@ jobs:
         - ${{ inputs.run-self-hosted && '/opt/runner_set_buildcache:/opt/runner_set_buildcache:rw' || '/dev/null:/dev/null:ro' }}
     services:
       upstream:
-        image: ${{ inputs.run-self-hosted && '' || 'ghcr.io/access-nri/build-ci-upstream:rocky-v0.22' }}
+        image: ${{ ! inputs.run-self-hosted && 'ghcr.io/access-nri/build-ci-upstream:rocky-v0.22' || '' }}
         volumes:
         - upstream-data:/opt/upstream:rw
     steps:
