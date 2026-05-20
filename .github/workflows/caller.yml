@@ -1,0 +1,6 @@
+name: Caller
+on:
+  workflow_call:
+jobs:
+  caller:
+    uses: ./.github/workflow/another-caller

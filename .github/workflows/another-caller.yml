@@ -1,0 +1,8 @@
+name: Another Caller
+on:
+  workflow_call:
+jobs:
+  another-caller:
+    runs-on: ubtunu-latest
+    steps:
+      - run: echo "Wow, I'm in the callee repo!"
