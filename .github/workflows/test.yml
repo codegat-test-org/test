@@ -2,24 +2,33 @@ name: Test Expressions
 on:
   workflow_dispatch:
     inputs:
-      run-self-hosted:
-        type: boolean
-        default: true
+      path1:
+        type: string
+        required: false
+        default: .github/actions/settings/action.yml
+      path2:
+        type: string
+        required: false
+        default: .github/actions/validate/action.yml
 jobs:
-  spack-install-and-test:
-    name: Install and Test
+  a:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/access-nri/build-ci-runner:rocky-v0.22
-      volumes:
-        # For self-hosted runners, mount the proper upstream and buildcache volumes from the kubernetes cluster
-        # For GitHub-hosted runners, mount the upstream but add a dummy buildcache volume /dev/null to avoid errors or undefined behavior, eg. fromJson('[]')
-        - ${{ inputs.run-self-hosted && '/opt/upstream:/opt/upstream:ro' || 'upstream-data:/opt/upstream:ro' }}
-        - ${{ inputs.run-self-hosted && '/opt/runner_set_buildcache:/opt/runner_set_buildcache:rw' || '/dev/null:/dev/null:ro' }}
-    services:
-      upstream:
-        image: ${{ ! inputs.run-self-hosted && 'ghcr.io/access-nri/build-ci-upstream:rocky-v0.22' || '' }}
-        volumes:
-        - upstream-data:/opt/upstream:rw
     steps:
-    - run: ls -alh /opt/upstream
+      - id: checkout
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |-
+            ${{ inputs.path1 }}
+            ${{ inputs.path2 }}
+
+      - name: Verify
+        run: tree -a
+
+      - name: Manifest - Delete History
+        # Specifically, this is to avoid exposing a private spack manifest repository's history to the actor if they SSH in
+        if: always() && steps.checkout.conclusion == 'success'
+        run: rm -rf ./.git
+
+      - name: Verify post-removal
+        run: tree -a
